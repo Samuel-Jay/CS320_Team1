@@ -1,25 +1,90 @@
-//import mongoose from 'mongoose';
+var mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-const mongoose = require('mongoose');
-
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema({
-	"firstName" : {type: String, required: false},
-	"lastName" : {type: String, required: false},
-	"employeeId" : {type: Number, required: false},
-	"email" : {type: String, required: false},
-	"companyId" : {type: Number, required: false},
-	"companyName" : {type: String, required: false},
-	"positionTitle" : {type: String, required: false},
-	"startDate" : {type: Date, required: false},
-	"isManager" : {type: Boolean, required: false},
-	"password" : {type: String, required: false}
-}, {
-	timestamps: true,
+const userSchema = mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  employeeId: {
+    type: Number,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: 1,
+  },
+  companyId: {
+    type: Number,
+    required: true,
+  },
+  companyName: {
+    type: String,
+    required: true,
+  },
+  positionTitle: {
+    type: String,
+    required: true,
+  },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  isManager: {
+    type: Boolean,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  token: {
+    type: String,
+  },
 });
 
-const User = mongoose.model('User', userSchema);
-//export default User ;
-module.exports = User;
-// blahh
+userSchema.methods.comparepassword = function (password, cb) {
+  bcrypt.compare(password, this.password, function (err, isMatch) {
+    if (err) return cb(next);
+    cb(null, isMatch);
+  });
+};
+
+userSchema.methods.generateToken = function (cb) {
+  var user = this;
+  var token = jwt.sign(user.email.toHexString(), confiq.SECRET);
+
+  user.token = token;
+  user.save(function (err, user) {
+    if (err) return cb(err);
+    cb(null, user);
+  });
+};
+
+userSchema.statics.findByToken = function (token, cb) {
+  var user = this;
+  jwt.verify(token, config.SECRET, function (err, decode) {
+    user.findOne({ _id: decode, token: token }, function (err, user) {
+      if (err) return cb(err);
+      cb(null, user);
+    });
+  });
+};
+
+userSchema.methods.deleteToken = function (token, cb) {
+  var user = this;
+
+  user.update({ $unset: { token: 1 } }, function (err, user) {
+    if (err) return cb(err);
+    cb(null, user);
+  });
+};
+
+module.exports = userSchema;

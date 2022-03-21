@@ -4,11 +4,12 @@ import * as userAPI from '../api/User.js';
 export const signin =  (user, navigate)=> async (dispatch) => {
 	try{
 		const {data} = await userAPI.login(user);
-		dispatch({type: 'LOGIN', payload: data});
-		if(!data.isAuth){
-			navigate()("/login")
-		}else{
+		if(data.isAuth){
+			dispatch({type: 'LOGIN', payload: data});
 			navigate()("/")
+		}else{
+			dispatch({type: 'FAILED', payload: data});
+			navigate()("/login")
 		}
 	}catch(err){
 		console.log(err)

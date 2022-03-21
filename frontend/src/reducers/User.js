@@ -7,7 +7,7 @@ function userReducer(state = {userData : null, hasFailed : true}, action){
 		localStorage.clear()
 		return { ...state, authData: null, hasFailed: false};
 	case "FAILED":
-		return { ...state, hasFailed: true};
+		return { ...state, authData: null, hasFailed: true};
 	default:
 		return state;
 	}

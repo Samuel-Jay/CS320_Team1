@@ -23,8 +23,13 @@
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
+<<<<<<< HEAD
     "mongoose": "^6.2.3",
     "nodemon": "^1.11.1",
     "react": "^17.0.2"
+=======
+    "mongoose": "^6.2.7",
+    "nodemon": "^2.0.15"
+>>>>>>> 907a02d8816e4767c96bc597ab2648e39efafd2b
   }
 }

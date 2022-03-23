@@ -1,3 +1,3 @@
-
-web-start: cd frontend && react-scripts start
+web: cd frontend
+start: react-scripts start
 web: node backend/index.js

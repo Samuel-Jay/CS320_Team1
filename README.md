@@ -4,23 +4,25 @@
 
 Each Json file represents data for a single company of a different size. "Snazzy Kangaroo Consulting" contains 100 employees, "Atlas Technology" contains 500 companies, and "Sonic Bionics" contains 2500 employees.
 Each file is a single Json array containing every employee for the company. Each element in the array looks something like this:
+
 ```json
 {
-  "firstName" : "Nicky",
-  "lastName" : "Sellers",
-  "employeeId" : 2,
-  "email" : "Nicky_Sellers@snazzykangarooconsulting.com",
-  "companyId" : 1,
-  "companyName" : "Snazzy Kangaroo Consulting",
-  "managerId" : 1,
-  "positionTitle" : "Engineering Manager",
-  "startDate" : "2016-05-04",
-  "isManager" : true,
-  "password" : "sellersni"
+  "firstName": "Nicky",
+  "lastName": "Sellers",
+  "employeeId": 2,
+  "email": "Nicky_Sellers@snazzykangarooconsulting.com",
+  "companyId": 1,
+  "companyName": "Snazzy Kangaroo Consulting",
+  "managerId": 1,
+  "positionTitle": "Engineering Manager",
+  "startDate": "2016-05-04",
+  "isManager": true,
+  "password": "sellersni"
 }
 ```
 
 Descriptions for each field are as follows:
+
 - firstName: The first name of the employee
 - lastName: The last name of the employee
 - employeeId: Unique identifier for the employee within the company. Within a company this is guaranteed to be unique but across companies employees may have the same identifier. A combination of companyId and employeeId is guaranteed to be unique across the full data set.
@@ -42,6 +44,7 @@ The following are the initial integrations with the unified inbox. Described bel
 An employee PTO is a request from one employee sent to their manager in order to request taking some time off. The following data should be a part of the request:
 
 To request, an employee will provide the following:
+
 - Type: The reason for this request, can be any of: Sick time, Jury duty, vacation, or parental leave.
 - Start Date: The date where the PTO will start
 - End Date: The date where the PTO will end
@@ -56,6 +59,7 @@ A performance review is a request from one employee to another in order to reque
 To request, an employee will simply select a list of their peers to send a performance review request to.
 
 On the receiving end, employees doing a performance review would fill in the following:
+
 - Overall comments: A place to provide a section of text on overall feedback about the employee they're reviewing.
 - Growth feedback: A score (1-5) and text field for the reviewer to provide feedback on how the employee they are reviewing has grown in their role through the year.
 - Kindness feedback: A score (1-5) and text field for the reviewer to provide feedback on whether the employee they are reviewing is someone they enjoy interacting with (or not).

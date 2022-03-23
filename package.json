@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "axios": "^0.26.1",
-    "mongoose": "^6.2.4"
-  },
-  "scripts": {
-    "start": "cd frontend && react-scripts start"
-  }
-}

@@ -1,18 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyparser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const app = express();
-const port = 3000;
-const { config, companies } = require("./config");
-const userSchema = require("./models/user");
-const { login } = require("./controllers/login");
-
-app.use(cors());
-app.use(bodyparser.urlencoded({ extended: false }));
-app.use(bodyparser.json());
-app.use(cookieParser());
+const passport = require("passport");
+const { config } = require("./config");
 
 mongoose.connect(
   `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
@@ -21,81 +10,34 @@ mongoose.connect(
     useUnifiedTopology: true,
   }
 );
+mongoose.connection.on("error", (error) => console.log(error));
+mongoose.connection.once("open", () =>
+  console.log("Database connected successfully!")
+);
+mongoose.Promise = global.Promise;
 
-var db = mongoose.connection;
-var User = db.model("users", userSchema);
-db.on("error", console.error.bind(console, "connection error: "));
-db.once("open", function () {
-  console.log("Connected successfully");
+require("./auth/auth");
+
+const routes = require("./routes/routes");
+const secureRoute = require("./routes/secure-routes");
+
+const app = express();
+
+app.use(express.json());
+
+app.use("/api", routes);
+
+// Plug in the JWT strategy as a middleware so only verified users can access this route.
+app.use("/user", passport.authenticate("jwt", { session: false }), secureRoute);
+
+// Handle errors.
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({ error: err });
 });
 
-app.post("/api/login", function (req, res) {
-  const companyDB = companies.get(req.body.email.split("@")[1]);
-  db = mongoose.connection.useDb(companyDB);
-  User = db.model("users", userSchema);
-
-  let token = req.cookies.auth;
-  User.findByToken(token, (err, user) => {
-    if (err) return res(err);
-    if (user)
-      return res.status(400).json({
-        error: true,
-        message: "You are already logged in",
-      });
-    else {
-      User.findOne(
-        { email: req.body.email, password: req.body.password },
-        function (err, user) {
-          if (!user)
-            return res.json({
-              isAuth: false,
-              message: "Invalid username or password",
-            });
-          // else
-          //   return res.json({
-          //     isAuth: true,
-          //     message: "Successful login",
-          //     data: user,
-          //   });
-          user.comparepassword(req.body.password, (err, isMatch) => {
-            if (!isMatch)
-              return res.json({
-                isAuth: false,
-                message: "password doesn't match",
-              });
-
-            user.generateToken((err, user) => {
-              if (err) return res.status(400).send(err);
-              res.cookie("auth", user.token).json({
-                isAuth: true,
-                id: user.employeeId,
-                email: user.email,
-              });
-            });
-          });
-        }
-      );
-    }
-  });
-});
-
-app.get("/api/dashboard", login, (req, res) => {
-  res.json({
-    isAuth: true,
-    id: req.user.employeeId,
-    email: req.user.email,
-    firstName: req.user.firstName,
-    lastName: req.user.lastName,
-  });
-});
-
-app.get("/api/logout", login, (req, res) => {
-  req.user.deleteToken(req.token, (err, user) => {
-    if (err) return res.status(400).send(err);
-    res.sendStatus(200);
-  });
-});
-
-app.listen(port, () => {
-  console.log(`Team1 listening on port ${port}: http://localhost:${port}\n `);
+app.listen(3000, () => {
+  console.log(
+    "Server started at port 3000, available at http://localhost:3000."
+  );
 });

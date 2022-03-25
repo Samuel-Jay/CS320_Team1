@@ -58,7 +58,7 @@ app.post('/tasks', (req, res) => {
                 endDate
             });
             newTask.save().then((taskDoc) => res.send(taskDoc));
-            
+            db.insertOne(newTask);
 
             // return res.json({
             //     message: "This person is a manager.",

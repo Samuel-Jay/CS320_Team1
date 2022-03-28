@@ -1,6 +1,6 @@
 import { Checkbox } from '@mui/material';
 import React,{useState} from 'react';
-import "./Task_row.css";
+import "./Taskrow.css";
 import CircleCheckedOutline from "@mui/icons-material/CheckCircle"
 import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked"
 const Task_row = () => {
@@ -29,4 +29,4 @@ const Task_row = () => {
     </div>
   );
 }
-export default Task_row;
+export default Taskrow;

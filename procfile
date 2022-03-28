@@ -1,0 +1,3 @@
+web: cd frontend
+start: react-scripts start
+web: node backend/index.js

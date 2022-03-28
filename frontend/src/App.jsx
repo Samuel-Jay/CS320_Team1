@@ -12,6 +12,7 @@ function App() {
 					<Routes>
 						<Route path="/" element={<Home/>} />
 						<Route path="/login" element={<Auth/>} />
+						<Route path="/searchbar" element={<Searchbar/>} />
 					</Routes>
 				</ div>
 			</BrowserRouter>

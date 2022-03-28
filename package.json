@@ -4,9 +4,8 @@
   "description": "backend setup for UTrack",
   "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node backend/index.js & (cd frontend && react-scripts start)"
   },
   "repository": {
     "type": "git",
@@ -37,10 +36,14 @@
     "node": "^17.7.1",
     "nodemon": "^1.11.1",
     "react": "^17.0.2",
+<<<<<<< HEAD
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.2",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1"
+=======
+    "react-scripts": "^5.0.0"
+>>>>>>> 197b9932c02905097d2943752ade60c587719d9b
   }
 }

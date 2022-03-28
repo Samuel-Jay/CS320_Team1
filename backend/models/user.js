@@ -37,6 +37,10 @@ const userSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
+  managerId: {
+    type: Number,
+    required: true,
+  },
   isManager: {
     type: Boolean,
     required: true,

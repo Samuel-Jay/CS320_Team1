@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const { config } = require("./config");
-const port = 5000;
+const port = 5001;
 
 mongoose.connect(
   `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
@@ -38,6 +38,6 @@ app.use(function (err, req, res, next) {
 
 app.listen(port, () => {
   console.log(
-    "Server started at port 3000, available at http://localhost:3000."
+    `Server started at port ${port}, available at http://localhost:${port}.`
   );
 });

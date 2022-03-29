@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TaskSchema = new mongoose.Schema({
+const PerformanceReview = new mongoose.Schema({
   assignerEmail: {
     type: String,
     required: true,
@@ -9,11 +9,19 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  taskName: {
+  overallComments: {
     type: String,
     required: true,
   },
-  taskDescription: {
+  growthFeedback: {
+    type: String,
+    required: true,
+  },
+  kindnessFeedback: {
+    type: String,
+    required: true,
+  },
+  deliveryFeedback: {
     type: String,
     required: true,
   },
@@ -21,11 +29,7 @@ const TaskSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  startDate: {
-    type: Date,
-    required: true,
-  },
-  endDate: {
+  dueDate: {
     type: Date,
     required: true,
   },
@@ -35,4 +39,4 @@ const TaskSchema = new mongoose.Schema({
   },
 });
 
-module.exports = TaskSchema;
+module.exports = PerformanceReview;

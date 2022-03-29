@@ -24,7 +24,6 @@ const secureRoute = require("./routes/secure-routes");
 const app = express();
 
 app.use(express.json());
-
 app.use("/api", routes);
 
 // Plug in the JWT strategy as a middleware so only verified users can access this route.

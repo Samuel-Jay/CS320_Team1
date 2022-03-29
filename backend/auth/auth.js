@@ -41,6 +41,7 @@ passport.use(
           companyName: req.body.companyName,
           positionTitle: req.body.positionTitle,
           startDate: req.body.startDate,
+          managerId: req.body.managerId,
           isManager: req.body.isManager,
           password: password,
         };

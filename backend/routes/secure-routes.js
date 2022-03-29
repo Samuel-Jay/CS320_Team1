@@ -60,9 +60,58 @@ router.post("/trainingTask/create", (req, res, next) => {
   }
 });
 
-// router.post("/trainingTask/edit", (req, res, next) => {
-//   TrainingTask.findOne({ _id: req.body._id }, (err, task) => {
-// });
+router.patch("/trainingTask/edit", (req, res, next) => {
+  try {
+    const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
+    const User = mongoose.connection
+      .useDb(companyDB)
+      .model("users", userSchema);
+    const TrainingTask = mongoose.connection
+      .useDb(companyDB)
+      .model("assignTraining", trainingSchema);
+
+    //   TrainingTask.find(
+    //     { taskName: req.body.taskName, assignerEmail: req.body.assignerEmail },
+    //     (err, tasks) => {
+    //       tasks = tasks.map(task => );
+    //     }
+    //   );
+    TrainingTask.findOne(
+      {
+        taskName: req.body.taskName,
+        assignerEmail: req.body.assignerEmail,
+      },
+      (err, task) => {
+        if (!task) {
+          return res.json({
+            code: 404,
+            message: "No task with such credentials found",
+          });
+        }
+        TrainingTask.updateMany(
+          {
+            taskName: req.body.taskName,
+            assignerEmail: req.body.assignerEmail,
+          },
+          {
+            ...req.body,
+          }
+        )
+          .then(() => {
+            return res.json({
+              code: 200,
+              message: "Tasks updated successfully",
+            });
+          })
+          .catch((err) => {
+            return res.json(err);
+          });
+      }
+    );
+  } catch (error) {
+    return res.json(error);
+  }
+});
 
 router.delete("/trainingTask/delete", (req, res, next) => {
   try {

@@ -1,0 +1,45 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 100vmin;
+  pointer-events: none;
+}
+
+.rectangle {
+  position: absolute;
+  top: 150px;
+  pointer-events: none;
+  width: 300px;
+  height: 400px;
+  background: rgba(228, 238, 248, 0.795);
+  border-radius: 25px;
+}
+
+.App-profilepic {
+  position: absolute;
+  height: 20vmin;
+  top: 170px;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #133d41;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: rgb(255, 255, 255);
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

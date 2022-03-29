@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const { config } = require("./config");
+const port = 5000;
 
 mongoose.connect(
   `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
@@ -35,7 +36,7 @@ app.use(function (err, req, res, next) {
   res.json({ error: err });
 });
 
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log(
     "Server started at port 3000, available at http://localhost:3000."
   );

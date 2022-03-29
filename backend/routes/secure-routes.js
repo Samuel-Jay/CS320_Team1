@@ -56,7 +56,7 @@ router.post("/trainingTask/create", (req, res, next) => {
       });
     });
   } catch (error) {
-    console.log(error);
+    return res.json(error);
   }
 });
 
@@ -70,12 +70,6 @@ router.patch("/trainingTask/edit", (req, res, next) => {
       .useDb(companyDB)
       .model("assignTraining", trainingSchema);
 
-    //   TrainingTask.find(
-    //     { taskName: req.body.taskName, assignerEmail: req.body.assignerEmail },
-    //     (err, tasks) => {
-    //       tasks = tasks.map(task => );
-    //     }
-    //   );
     TrainingTask.findOne(
       {
         taskName: req.body.taskName,
@@ -116,24 +110,13 @@ router.patch("/trainingTask/edit", (req, res, next) => {
 router.delete("/trainingTask/delete", (req, res, next) => {
   try {
     const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
-    const User = mongoose.connection
-      .useDb(companyDB)
-      .model("users", userSchema);
+    // const User = mongoose.connection
+    //   .useDb(companyDB)
+    //   .model("users", userSchema);
     const TrainingTask = mongoose.connection
       .useDb(companyDB)
       .model("assignTraining", trainingSchema);
 
-    // TrainingTask.find({ taskName: req.body.taskName }, async (err, tasks) => {
-    //   if (!tasks) {
-    //     return res.json({ code: 404, message: "Task does not exist" });
-    //   }
-    //   if (tasks[0].assignerEmail !== req.body.assignerEmail) {
-    //     return res.json({ code: 404, message: "Unauthorized" });
-    //   }
-    //   for (var task of tasks) {
-    //     TrainingTask.deleteOne({ taskName: task.taskName });
-    //   }
-    // });
     TrainingTask.findOne(
       {
         taskName: req.body.taskName,
@@ -162,7 +145,7 @@ router.delete("/trainingTask/delete", (req, res, next) => {
       }
     );
   } catch (error) {
-    console.log(error);
+    return res.json(error);
   }
 });
 

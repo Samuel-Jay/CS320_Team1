@@ -4,14 +4,15 @@ const Schema = mongoose.Schema;
 
 const TrainSchema = new Schema(
   {
-    taskId: {type: Number, required: false},
-    assignerId: { type: Number, required: false },
-    assigneeId: { type: Number, required: false },
-    taskName: {type: String, required: false},
-    taskLink: {type: String, required: false},
-    taskDescription: {type: String, required: false},
-    dueDate: { type: Date, required: false },
-    status: { type: Boolean, required: false },
+    taskId: {type: Number, required: true},
+    assignerEmail: { type: String, required: true },
+    assigneeEmail: { type: String, required: true },
+    taskName: {type: String, required: true},
+    taskLink: {type: String, required: true},
+    taskDescription: {type: String, required: true},
+    startDate: {type: Date, required: true},
+    dueDate: { type: Date, required: true },
+    status: { type: Boolean, required: true },
   },
   {
     timestamps: true,

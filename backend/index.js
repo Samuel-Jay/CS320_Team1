@@ -1,18 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyparser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const app = express();
-const port = 3000;
-const { config, companies } = require("./config");
-const userSchema = require("./models/user");
-const { login } = require("./controllers/login");
-
-app.use(cors());
-app.use(bodyparser.urlencoded({ extended: false }));
-app.use(bodyparser.json());
-app.use(cookieParser());
+const passport = require("passport");
+const { config } = require("./config");
+const port = 5001;
 
 mongoose.connect(
   `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
@@ -21,93 +11,33 @@ mongoose.connect(
     useUnifiedTopology: true,
   }
 );
+mongoose.connection.on("error", (error) => console.log(error));
+mongoose.connection.once("open", () =>
+  console.log("Database connected successfully!")
+);
+mongoose.Promise = global.Promise;
 
-var db = mongoose.connection;
-var User = db.model("users", userSchema);
-db.on("error", console.error.bind(console, "connection error: "));
-db.once("open", function () {
-  console.log("Connected successfully");
-});
+require("./auth/auth");
 
-// app.get("/api-login-test", function (req, res) {
-//   const email = "Lou_Livingston@snazzykangarooconsulting.com";
-//   const password =
-//     "$2a$10$zjA3WjWayGr9laNbGhCCCu5T2PDu4dcmuUQ.rHH7h8QyTW9bWAUG2";
-//   User.findOne({ email: email, password: password }, (err, user) => {
-//     console.log(user);
-//   });
-// });
+const routes = require("./routes/routes");
+const secureRoute = require("./routes/secure-routes");
 
-app.post("/api/login", function (req, res) {
-  const companyDB = companies.get(req.body.email.split("@")[1]);
-  db = mongoose.connection.useDb(companyDB);
-  // let token = req.cookies.auth;
-  // User.findByToken(token, (err, user) => {
-  //   if (err) return res(err);
-  //   if (user)
-  //     return res.status(400).json({
-  //       error: true,
-  //       message: "You are already logged in",
-  //     });
-  //   else {
-  User = db.model("users", userSchema);
-  User.findOne(
-    { email: req.body.email, password: req.body.password },
-    function (err, user) {
-      if (!user)
-        return res.json({
-          isAuth: false,
-          message: "Invalid username or password",
-        });
-      else
-        return res.json({
-          isAuth: true,
-          message: "Successful login",
-          data: user,
-        });
-      //     user.comparepassword(req.body.password, (err, isMatch) => {
-      //       if (!isMatch)
-      //         return res.json({
-      //           isAuth: false,
-      //           message: "password doesn't match",
-      //         });
+const app = express();
 
-      //       user.generateToken((err, user) => {
-      //         if (err) return res.status(400).send(err);
-      //         res.cookie("auth", user.token).json({
-      //           isAuth: true,
-      //           id: user.employeeId,
-      //           email: user.email,
-      //         });
-      //       });
-      //     });
-      //   });
-      // }
-    }
-  );
-});
+app.use(express.json());
+app.use("/api", routes);
 
-app.get("/api/profile", login, function (req, res) {
-  res.json({
-    isAuth: true,
-    id: req.user.employeeId,
-    email: req.user.email,
-    firstName: req.user.firstName,
-    lastName: req.user.lastName,
-  });
-});
+// Plug in the JWT strategy as a middleware so only verified users can access this route.
+app.use("/user", passport.authenticate("jwt", { session: false }), secureRoute);
 
-app.get("/api/logout", login, function (req, res) {
-  req.user.deleteToken(req.token, (err, user) => {
-    if (err) return res.status(400).send(err);
-    res.sendStatus(200);
-  });
+// Handle errors.
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({ error: err });
 });
 
 app.listen(port, () => {
-  const user = db.collection("user");
-  // console.log(user);
   console.log(
-    `Example app listening on port ${port}: http://localhost:${port}\n `
+    `Server started at port ${port}, available at http://localhost:${port}.`
   );
 });

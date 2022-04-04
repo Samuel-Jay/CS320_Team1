@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 const PTOSchema = new Schema(
   {
-    ptoTitle: {type: String, required: true},
-    ptoDescription: {type: String, required: true},
-    ptoID: {type: Number, required: true},
+    title: {type: String, required: true},
+    description: {type: String, required: true},
+    taskId: {type: Number, required: true},
     assignedTo: { type: String, required: false },
     assignedBy: { type: String, required: false },
     startDate: { type: Date, required: false },

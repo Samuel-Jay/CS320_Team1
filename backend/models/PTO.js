@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const PTOSchema = new Schema(
   {
     title: {type: String, required: true},
-    description: {type: String, required: true},
+    reason: {type: String, required: true},
     taskId: {type: Number, required: true},
     assignedTo: { type: String, required: false },
     assignedBy: { type: String, required: false },

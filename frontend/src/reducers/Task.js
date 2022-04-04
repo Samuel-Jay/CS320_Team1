@@ -1,4 +1,4 @@
-function taskReducer(state = {taskList:null , openTask:null, category:"UNCOMPLETE"}){
+function taskReducer(state = {taskList:[] , openTask:null, category:"UNCOMPLETE"}, action){
 	switch(action.type){
 	case "UNCOMPLETE":
 		return { ...state,category:"UNCOMPLETE"};
@@ -14,4 +14,4 @@ function taskReducer(state = {taskList:null , openTask:null, category:"UNCOMPLET
 
 }
 
-export default userReducer
+export default taskReducer

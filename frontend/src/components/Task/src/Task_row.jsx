@@ -4,6 +4,7 @@ import "./indiTask.jsx";
 import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
 import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
 import List from "@mui/material/List";
+import {useSelector} from 'react-redux';
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText';
 import {useState} from 'react';
@@ -39,7 +40,9 @@ const Task_row = () => {
     }
     function list_items(status)
     {
-        return this.state.tasklist.map(task=>
+        const taskList=useSelector((state ) => state.task.taskList)
+        console.log(taskList)
+        return taskList.map(task=>
             {
                 if(task.get("status")==status){
                     <div className='EmailRow' style={{ backgroundColor: background }} onClick={open_task()}>

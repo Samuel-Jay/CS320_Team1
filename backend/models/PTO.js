@@ -4,13 +4,15 @@ const Schema = mongoose.Schema;
 
 const PTOSchema = new Schema(
   {
-    requesterId: { type: Number, required: false },
-    requesteeId: { type: Number, required: false },
-    type: { type: String, required: false },
-    startDate: { type: Date, required: false },
-    endDate: { type: Date, required: false },
-    dueDate: { type: Date, required: false },
-    notes: { type: String, required: false },
+    title: {type: String, required: true},
+    description: {type: String, required: true},
+    taskId: {type: Number, required: true},
+    assignedTo: { type: String, required: true },
+    assignedBy: { type: String, required: true },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    dueDate: { type: Date, required: true },
+    status: {type: String, required: true},
   },
   {
     timestamps: true,

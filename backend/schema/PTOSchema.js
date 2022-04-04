@@ -18,6 +18,18 @@ const PTOSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    assignerEmail: {
+      type: String,
+      required: true,
+    },
+    assigneeEmail: {
+      type: String,
+      required: true,
+    },
+    dueDate: {
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
       required: true,

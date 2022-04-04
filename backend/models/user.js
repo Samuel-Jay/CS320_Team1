@@ -39,7 +39,7 @@ const userSchema = mongoose.Schema({
   },
   managerId: {
     type: Number,
-    required: true,
+    required: false,
   },
   isManager: {
     type: Boolean,

@@ -1,32 +1,78 @@
 import { Checkbox } from '@mui/material';
-import React,{useState} from 'react';
 import "./Task_row.css";
-import CircleCheckedOutline from "@mui/icons-material/CheckCircle"
-import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked"
+import "./indiTask.jsx";
+import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
+import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
+import List from "@mui/material/List";
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText';
+import {useState} from 'react';
+import {useDispatch} from 'react-redux';
+import {changeDisp} from '../../../actions/Task.js';
 const Task_row = () => {
     const[background,setbackground] = useState("#ffff");
+    const dispatch = useDispatch();
+    const flexContainer ={
+        display:'flex',
+        flexDirection: 'row',
+        backgroundColor: background,
+        padding: 10,
+    };
     function change_background(){
         setbackground("#F0F2F5");
     }
+    function open_task()
+    {
+        change_background();
+        dispatch(changeDisp())
+    }
+    function change_status(task)
+    {
+        if(task.get("status")=="incomplete")
+        {
+            task.changeStat("complete");
+        }
+        else
+        {
+            task.changeStat("incomplete");
+        }
+    }
+    function list_items(status)
+    {
+        return this.state.tasklist.map(task=>
+            {
+                if(task.get("status")==status){
+                    <div className='EmailRow' style={{ backgroundColor: background }} onClick={open_task()}>
+                    <Checkbox defaultChecked size="small" onChange={change_status(task)} icon={<CircleCheckedOutline />} checkedIcon={<CircleUncheckedOutline />}>
+                    </Checkbox>
+                    <h3 className=" EmailRow_title">
+                        {task.get("name")}
+                    </h3>
+                    <div className="EmailRow_Subject">
+                        <h4>
+                            {task.get("subject")}
+                            <span className='EmailRow_Description'>
+                                {task.get("description")}
+                            </span>
+                        </h4>
+                    </div>
+                    <div className="time">
+                        {task.get("time")}
+                    </div>
+                    </div>
+                }
+            })
+    }
   return (
-    <div className='EmailRow' style={{backgroundColor:background}} onClick={change_background}>
-        <Checkbox defaultChecked size="small" icon = {<CircleCheckedOutline/>} checkedIcon = {<CircleUncheckedOutline />} >
-        </Checkbox>
-        <h3 className = " EmailRow_title">
-            {"Employee_Name"}
-        </h3>
-        <div className = "EmailRow_Subject">
-            <h4>
-                {"Personal time off request!! "} 
-                <span className='EmailRow_Description'>
-                     {"- Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"}
-                </span>
-            </h4>
-        </div>
-        <div className ="time">
-            10pm
-        </div>
-    </div>
+    <><List style={flexContainer}>
+          <ListItem button onClick={list_items("incomplete")}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
+          <ListItem button onClick={list_items("complete")}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
+          <ListItem button onClick={list_items("archive")}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
+      </List>
+      <List>
+        {list_items("incomplete")}
+      </List>
+      </>
   );
 }
 export default Task_row;

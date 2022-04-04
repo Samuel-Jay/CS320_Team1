@@ -1,51 +1,51 @@
-@font-face {
-    font-family: robot;
-    src: url(/Roboto/Roboto-Regular.ttf);
-  }
+/* @font-face {
+  font-family: robot;
+  /* src: url("/components/Task/src/Roboto/Roboto-Regular.ttf"); */
+/* } */
 .EmailRow {
-    display: flex;
-    align-items: center;
-    /* width: 1000px; */
-    height: 50px;
-    border-bottom: 1px solid whitesmoke;
-    cursor: pointer;
-    z-index: 999;
+  display: flex;
+  align-items: center;
+  /* width: 1000px; */
+  height: 50px;
+  border-bottom: 1px solid whitesmoke;
+  cursor: pointer;
+  z-index: 999;
 }
-.EmailRow:hover{
-    border-top: 1px solid whitesmoke;
-    box-shadow: 0px 4px 4px -2px rgba(0, 0, 0, 0.24);
+.EmailRow:hover {
+  border-top: 1px solid whitesmoke;
+  box-shadow: 0px 4px 4px -2px rgba(0, 0, 0, 0.24);
 }
-.EmailRow .EmailRow_title{
-    display: flex;
-    flex: 0.1;
-    overflow: hidden;
-    align-items: center;
-    font-size: 12px;
-    font-family:robot ;
+.EmailRow .EmailRow_title {
+  display: flex;
+  flex: 0.1;
+  overflow: hidden;
+  align-items: center;
+  font-size: 12px;
+  /* font-family: robot; */
 }
-.EmailRow .EmailRow_Subject{
-    display: flex;
-    flex: 0.8;
-    overflow: hidden;
-    align-items: center;
-    font-size: 12px;
-    font-family:robot;
+.EmailRow .EmailRow_Subject {
+  display: flex;
+  flex: 0.8;
+  overflow: hidden;
+  align-items: center;
+  font-size: 12px;
+  /* font-family: robot; */
 }
-.EmailRow .EmailRow_Subject > h4{
-    width: 1000px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-left: 5px;
-    padding-right: 5px;
+.EmailRow .EmailRow_Subject > h4 {
+  width: 1000px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 5px;
+  padding-right: 5px;
 }
-.EmailRow .EmailRow_Subject .EmailRow_Description{
-    color: gray;
-    flex:0.8;
+.EmailRow .EmailRow_Subject .EmailRow_Description {
+  color: gray;
+  flex: 0.8;
 }
 
-.EmailRow .time{
-    font-size: 12px;
-    display: center;
-    font-family:robot;
+.EmailRow .time {
+  font-size: 12px;
+  display: center;
+  /* font-family: robot; */
 }

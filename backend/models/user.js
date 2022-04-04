@@ -14,6 +14,7 @@ const userSchema = mongoose.Schema({
   employeeId: {
     type: Number,
     required: true,
+    unique: 1,
   },
   email: {
     type: String,
@@ -36,6 +37,10 @@ const userSchema = mongoose.Schema({
   startDate: {
     type: Date,
     required: true,
+  },
+  managerId: {
+    type: Number,
+    required: false,
   },
   isManager: {
     type: Boolean,

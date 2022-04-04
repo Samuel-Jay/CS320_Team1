@@ -4,9 +4,12 @@ const Schema = mongoose.Schema;
 
 const TrainSchema = new Schema(
   {
-    requesterId: { type: Number, required: false },
-    traineeId: { type: Number, required: false },
-    source: { type: String, required: false },
+    taskId: {type: Number, required: false},
+    assignerId: { type: Number, required: false },
+    assigneeId: { type: Number, required: false },
+    taskName: {type: String, required: false},
+    taskLink: {type: String, required: false},
+    taskDescription: {type: String, required: false},
     dueDate: { type: Date, required: false },
     status: { type: Boolean, required: false },
   },

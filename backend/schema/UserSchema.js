@@ -43,7 +43,7 @@ const UserSchema = new mongoose.Schema(
     },
     isManager: {
       type: Boolean,
-      required: true,
+      required: false,
     },
     password: {
       type: String,

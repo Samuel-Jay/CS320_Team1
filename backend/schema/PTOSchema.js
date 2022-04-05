@@ -9,7 +9,7 @@ const PTOSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    mangerEmail: {
+    managerEmail: {
       type: String,
       required: true,
     },
@@ -30,14 +30,6 @@ const PTOSchema = new mongoose.Schema(
       required: true,
     },
     reason: {
-      type: String,
-      required: true,
-    },
-    assignerEmail: {
-      type: String,
-      required: true,
-    },
-    assigneeEmail: {
       type: String,
       required: true,
     },

@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const TrainingSchema = new mongoose.Schema(
   {
+    taskId: {
+      type: Number,
+      required: true,
+    },
     assignerEmail: {
       type: String,
       required: true,

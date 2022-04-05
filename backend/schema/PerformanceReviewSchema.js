@@ -2,12 +2,20 @@ const mongoose = require("mongoose");
 
 const PerformanceReview = new mongoose.Schema(
   {
-    assignerEmail: {
+    reviewerEmail: {
       type: String,
       required: true,
     },
-    assigneeEmail: {
+    revieweeEmail: {
       type: String,
+      required: true,
+    },
+    companyId: {
+      type: Number,
+      required: true,
+    },
+    companyName: {
+      type: Number,
       required: true,
     },
     overallComments: {

@@ -82,6 +82,47 @@ router.post("/trainingTask/create", (req, res, next) => {
   }
 });
 
+router.get("/trainingTask/get", async (req, res, next) => {
+  const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
+  const TrainingTask = mongoose.connection
+    .useDb(companyDB)
+    .model("assignTraining", trainingSchema);
+  userTrainingTasks = {};
+  await TrainingTask.find({ assigneeEmail: req.body.requestorEmail })
+    .then((tasks) => {
+      if (!tasks) {
+        return res.json({
+          code: 404,
+          message: "No assigned tasks found for the user",
+        });
+      }
+      userTrainingTasks["received"] = tasks;
+    })
+    .catch((err) =>
+      res.json({
+        code: 500,
+        message: err.message,
+      })
+    );
+  await TrainingTask.find({ assignerEmail: req.body.requestorEmail })
+    .then((tasks) => {
+      if (!tasks) {
+        return res.json({
+          code: 404,
+          message: "User has not created any training tasks",
+        });
+      }
+      userTrainingTasks["created"] = tasks;
+    })
+    .catch((err) =>
+      res.json({
+        code: 500,
+        message: err.message,
+      })
+    );
+  return res.json(userTrainingTasks);
+});
+
 router.patch("/trainingTask/edit", (req, res, next) => {
   try {
     const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);

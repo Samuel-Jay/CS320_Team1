@@ -1,6 +1,7 @@
 const express = require("express");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const { companies } = require("../config");
 
 const router = express.Router();
 
@@ -29,8 +30,7 @@ router.post("/login", async (req, res, next) => {
 
         const body = { _id: user._id, email: user.email };
         const token = jwt.sign({ user: body }, "TOP_SECRET");
-
-        return res.json({ token });
+        return res.json({ user: user, token: token });
       });
     } catch (error) {
       return next(error);

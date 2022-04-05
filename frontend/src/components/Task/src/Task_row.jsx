@@ -10,7 +10,7 @@ import List from "@mui/material/List";
 import {useSelector} from 'react-redux';
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {changeDisp, incomplete, complete, archive} from '../../../actions/Task.js';
 const Task_row = () => {
@@ -52,36 +52,36 @@ const Task_row = () => {
         {
             task.changeStat("incomplete");
         }
+        const reload=useSelector((state ) => state.task.category)
+        if(reload.toLowerCase()==="uncomplete")
+        {
+            useEffect(()=>{list_items("incomplete")});
+        }
+        else
+        {
+            useEffect(()=>{list_items("complete")});
+        }
     }
     function proper_status(task)
     {
         if (task=== "incomplete")
         {
             dispatch(incomplete());
-            list_items(task);
         }
         else if (task=== "complete")
         {
             dispatch(complete());
-            list_items(task);
         }
         else
         {
             dispatch(archive());
-            list_items(task);
         }
-        const reload=useSelector((state ) => state.task.category)
-        if(reload.toLowerCase()==="uncomplete")
-        {
-            list_items("incomplete");
-        }
-        else
-        {
-            list_items(reload.toLowerCase()==="uncomplete");
-        }
+  
     }
     function list_items(status)
     {
+        useEffect(() => {
+        }, [dispatch])
         const taskList=useSelector((state ) => state.task.taskList);
         return taskList.map(task=>
             {
@@ -133,10 +133,11 @@ const Task_row = () => {
     return (
         <>
             <List style={flexContainer}>
-                <ListItem button onClick={ proper_status("incomplete")}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
-                <ListItem button onClick={proper_status("complete")}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
-                <ListItem button onClick={proper_status("archive")}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
+            <ListItem button onClick={ () => {proper_status("incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
+            <ListItem button onClick={ () => {proper_status("complete")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
+            <ListItem button onClick={ () => {proper_status("archive")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
             </List>
+
             <List>
                 {list_items("incomplete")}
             </List>

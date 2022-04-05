@@ -53,7 +53,8 @@ router.post("/trainingTask/create", (req, res, next) => {
           var taskData = {
             taskId: Math.abs(
               generateHash(
-                req.body.taskName +
+                req.body.assignerEmail +
+                  req.body.taskName +
                   req.body.taskLink +
                   req.body.startDate +
                   req.body.dueDate
@@ -98,12 +99,12 @@ router.get("/trainingTask/get", async (req, res, next) => {
       }
       userTrainingTasks["received"] = tasks;
     })
-    .catch((err) =>
-      res.json({
+    .catch((err) => {
+      return res.json({
         code: 500,
         message: err.message,
-      })
-    );
+      });
+    });
   await TrainingTask.find({ assignerEmail: req.body.requestorEmail })
     .then((tasks) => {
       if (!tasks) {
@@ -114,70 +115,72 @@ router.get("/trainingTask/get", async (req, res, next) => {
       }
       userTrainingTasks["created"] = tasks;
     })
-    .catch((err) =>
-      res.json({
+    .catch((err) => {
+      return res.json({
         code: 500,
         message: err.message,
-      })
-    );
+      });
+    });
   return res.json(userTrainingTasks);
 });
 
 router.patch("/trainingTask/edit", (req, res, next) => {
-  try {
-    const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-    const TrainingTask = mongoose.connection
-      .useDb(companyDB)
-      .model("assignTraining", trainingSchema);
+  const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
+  const TrainingTask = mongoose.connection
+    .useDb(companyDB)
+    .model("assignTraining", trainingSchema);
 
-    TrainingTask.findOne(
-      {
-        taskId: req.body.taskId,
-      },
-      (err, task) => {
-        if (!task) {
-          return res.json({
-            code: 404,
-            message: "No task with such credentials found",
-          });
-        }
-
-        if (req.body.requestorEmail === task.assignerEmail) {
-          TrainingTask.updateMany(
-            {
-              taskId: req.body.taskId,
-              assignerEmail: req.body.requestorEmail,
-            },
-            {
-              ...req.body,
-            }
-          ).then(() => {
+  TrainingTask.findOne({ taskId: req.body.taskId })
+    .then((task) => {
+      if (!task) {
+        return res.json({
+          code: 404,
+          message: "No task with such credentials found",
+        });
+      }
+      if (req.body.requestorEmail === task.assignerEmail) {
+        TrainingTask.updateMany(
+          {
+            taskId: req.body.taskId,
+            assignerEmail: req.body.requestorEmail,
+          },
+          {
+            ...req.body,
+          }
+        )
+          .then(() => {
             return res.json({
               code: 200,
               message: "Training Tasks updated successfully",
             });
+          })
+          .catch((err) => {
+            return res.json({ message: error.message });
           });
-        } else if (req.body.requestorEmail === task.assigneeEmail) {
-          TrainingTask.updateOne(
-            {
-              taskId: req.body.taskId,
-              assigneeEmail: req.body.requestorEmail,
-            },
-            {
-              ...req.body,
-            }
-          ).then(() => {
+      } else {
+        TrainingTask.updateOne(
+          {
+            taskId: req.body.taskId,
+            assigneeEmail: req.body.requestorEmail,
+          },
+          {
+            ...req.body,
+          }
+        )
+          .then(() => {
             return res.json({
               code: 200,
               message: "Training Task updated successfully",
             });
+          })
+          .catch((error) => {
+            return res.json({ message: error.message });
           });
-        }
       }
-    );
-  } catch (error) {
-    return res.json(error);
-  }
+    })
+    .catch((error) => {
+      return res.json({ message: error.message });
+    });
 });
 
 router.delete("/trainingTask/delete", (req, res, next) => {

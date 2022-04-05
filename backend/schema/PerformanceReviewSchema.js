@@ -10,6 +10,14 @@ const PerformanceReview = new mongoose.Schema(
       type: String,
       required: true,
     },
+    companyId: {
+      type: Number,
+      required: true,
+    },
+    companyName: {
+      type: Number,
+      required: true,
+    },
     overallComments: {
       type: String,
       required: true,

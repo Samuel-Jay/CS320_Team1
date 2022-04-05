@@ -1,5 +1,5 @@
 import axios from 'axios';
 
-let url = "http://localhost:5000/api"
+const instance = axios.create({ baseURL: 'http://localhost:5001' });
 
-export const getTask = () => axios.post(url + "/task", task);
+export const signIn = (formData) => instance.post('/api/login', formData);

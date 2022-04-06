@@ -1,18 +1,19 @@
-import React, {useState} from 'react'
-import {Checkbox, Button, Menu, MenuItem}  from '@mui/material'
+import React, {useState} from "react";
+import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
 
-import CircleCheckedOutline from "@mui/icons-material/CheckCircle"
-import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked"
+import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
+import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
 function Task(task){
     const[background,setbackground] = useState("#ffff");
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     function handleClose(){
         setAnchorEl(null);
-    };
+    }
     function handleClick(event){
         setAnchorEl(event.currentTarget);
-    };
+    }
+
     function change_background(){
         setbackground("#F0F2F5");
     }
@@ -23,7 +24,7 @@ function Task(task){
         
     }
     return (
-        <div className='EmailRow' style={{ backgroundColor: background }} onClick={open_task}>
+        <div className="EmailRow" style={{ backgroundColor: background }} onClick={open_task}>
             <Checkbox defaultChecked size="small" onChange={change_status(task)} icon={<CircleCheckedOutline />} checkedIcon={<CircleUncheckedOutline />}>
             </Checkbox>
             <h3 className=" EmailRow_title">
@@ -31,7 +32,7 @@ function Task(task){
             </h3>
             <div className="EmailRow_Subject">
                 <h4>
-                    <span className='EmailRow_Description'>
+                    <span className="EmailRow_Description">
                         {task.task.taskDescription}
                     </span>
                 </h4>
@@ -42,9 +43,9 @@ function Task(task){
             <div>
                 <Button
                     id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
+                    aria-controls={open ? "basic-menu" : undefined}
                     aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
+                    aria-expanded={open ? "true" : undefined}
                     onClick={handleClick}
                 >
                     Arch
@@ -55,7 +56,7 @@ function Task(task){
                     open={open}
                     onClose={handleClose}
                     MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                        "aria-labelledby": "basic-button",
                     }}
                 >
                     <MenuItem onClick={change_status("archive")}>Archive</MenuItem>
@@ -63,7 +64,7 @@ function Task(task){
                 </Menu>
             </div>
         </div>
-    ) 
+    );
 }
 
-export default Task
+export default Task;

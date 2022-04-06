@@ -19,15 +19,15 @@ const themeLight = createTheme({
 
 function App() {
     return (
-	<BrowserRouter>
-	    <div style = {{width: '100%', height: '100%', backgroundImage: `url(${background})`}}>
+        <BrowserRouter>
+            <div style = {{width: '100%', height: '100%', backgroundImage: `url(${background})`}}>
                 <Navbar/>
-		<Routes>
-		    <Route path="/" element = {<Task_row/>}/>
-		    <Route path="/login" element={<Auth/>} />
-		</Routes>
-	    </ div>
-	</BrowserRouter>
+                <Routes>
+                    <Route path="/" element = {<Task_row/>}/>
+                    <Route path="/login" element={<Auth/>} />
+                </Routes>
+            </ div>
+        </BrowserRouter>
     );
 }
 

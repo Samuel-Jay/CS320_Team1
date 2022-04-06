@@ -52,6 +52,29 @@ const Task_row = () => {
                     }):( <></>
                        )
             }
+            { 
+                show==="Incomplete"?taskList
+                    .filter(task => task.status === "Incomplete")
+                    .map(task=>
+
+                        {
+                        return(
+                            <Task key={task._id} task={task}/>
+                        )
+                    }):( <></>
+                       )
+            }
+            { 
+                show==="Completed"?taskList
+                    .filter(task => task.status === "Completed")
+                    .map(task=>
+                        {
+                            return(
+                                <Task key={task._id} task={task}/>
+                            )
+                        }):( <></>
+                           )
+            }
         </>
     ) 
 }

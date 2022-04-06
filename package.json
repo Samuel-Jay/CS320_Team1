@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "backend setup for UTrack",
     "main": "index.js",
+    "proxy": "http://localhost:5001",
     "engines": {
         "node": "16.x",
         "npm": "8.5"
@@ -64,3 +65,4 @@
         "eslint-plugin-react": "^7.29.4"
     }
 }
+

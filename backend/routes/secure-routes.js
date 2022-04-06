@@ -28,9 +28,9 @@ router.get("/profile", (req, res, next) => {
 router.post("/employees/get", async (req, res, next) => {
     const companyDB = companies.get(req.body.email.split("@")[1]);
     const User = mongoose.connection
-          .useDb(companyDB)
-          .model("users", userSchema);
-    respond = {}
+        .useDb(companyDB)
+        .model("users", userSchema);
+    respond = {};
     await User.find({ managerId: req.body.employeeId })
         .then((employees) => {
             if (!employees) {
@@ -55,11 +55,11 @@ router.post("/trainingTask/create", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
         const User = mongoose.connection
-              .useDb(companyDB)
-              .model("users", userSchema);
+            .useDb(companyDB)
+            .model("users", userSchema);
         const TrainingTask = mongoose.connection
-              .useDb(companyDB)
-              .model("assignTraining", trainingSchema);
+            .useDb(companyDB)
+            .model("assignTraining", trainingSchema);
 
         User.findOne({ email: req.body.assignerEmail }, async (err, admin) => {
             if (!admin) {
@@ -140,8 +140,8 @@ router.post("/trainingTask/create", (req, res, next) => {
 router.post("/trainingTask/get", async (req, res, next) => {
     const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
     const TrainingTask = mongoose.connection
-          .useDb(companyDB)
-          .model("assignTraining", trainingSchema);
+        .useDb(companyDB)
+        .model("assignTraining", trainingSchema);
     userTrainingTasks = {};
     await TrainingTask.find({ assigneeEmail: req.body.requestorEmail })
         .then((tasks) => {
@@ -182,8 +182,8 @@ router.patch("/trainingTask/edit", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const TrainingTask = mongoose.connection
-              .useDb(companyDB)
-              .model("assignTraining", trainingSchema);
+            .useDb(companyDB)
+            .model("assignTraining", trainingSchema);
 
         TrainingTask.findOne(
             {
@@ -239,8 +239,8 @@ router.delete("/trainingTask/delete", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
         const TrainingTask = mongoose.connection
-              .useDb(companyDB)
-              .model("assignTraining", trainingSchema);
+            .useDb(companyDB)
+            .model("assignTraining", trainingSchema);
 
         TrainingTask.findOne(
             {
@@ -278,11 +278,11 @@ router.post("/pto/create", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const User = mongoose.connection
-              .useDb(companyDB)
-              .model("users", userSchema);
+            .useDb(companyDB)
+            .model("users", userSchema);
         const PTOTask = mongoose.connection
-              .useDb(companyDB)
-              .model("PTORequests", ptoSchema);
+            .useDb(companyDB)
+            .model("PTORequests", ptoSchema);
 
         User.findOne({ email: req.body.requestorEmail }, async (err, employee) => {
             if (!employee) {
@@ -335,8 +335,8 @@ router.patch("pto/edit", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const PTOTask = mongoose.connection
-              .useDb(companyDB)
-              .model("PTORequests", ptoSchema);
+            .useDb(companyDB)
+            .model("PTORequests", ptoSchema);
         PTOTask.findOne(
             {
                 taskId: req.body.taskId,
@@ -373,8 +373,8 @@ router.delete("pto/delete", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const PTOTask = mongoose.connection
-              .useDb(companyDB)
-              .model("PTORequests", ptoSchema);
+            .useDb(companyDB)
+            .model("PTORequests", ptoSchema);
 
         PTOTask.findOne({ taskId: req.body.taskId }, (err, task) => {
             if (!task) {

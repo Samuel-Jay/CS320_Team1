@@ -1,32 +1,32 @@
-const express = require('express');
-const { default: mongoose } = require('mongoose');
-const bodyParser = require('body-parser');
+const express = require("express");
+const { default: mongoose } = require("mongoose");
+const bodyParser = require("body-parser");
 const app = express();
 
 app.use(bodyParser.json());
 
 // Only connects to the Atlas-Tech database. Connection will be determined by user's login information.
-mongoose.connect(`mongodb+srv://team1:team1project@cluster0.ba40p.mongodb.net/Atlas-Tech?retryWrites=true&w=majority`, 
-{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('Successfully connected to MongoDB');
+mongoose.connect("mongodb+srv://team1:team1project@cluster0.ba40p.mongodb.net/Atlas-Tech?retryWrites=true&w=majority", 
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => {
+    console.log("Successfully connected to MongoDB");
 }).catch((e) => {
-    console.log('Error with connecting to MongoDB');
+    console.log("Error with connecting to MongoDB");
     console.log(e);
 });
 var db = mongoose.connection;
 
 // Load schemas
-const userSchema = require('../schema/UserSchema')
-const User = db.model('users', userSchema);
-const { TA } = require('../schema/TrainingSchema');
-const { PTO } = require('../schema/PTOSchema');
-const { PFRV } = require('../schema/PerformanceReviewSchema');
+const userSchema = require("../schema/UserSchema");
+const User = db.model("users", userSchema);
+const { TA } = require("../schema/TrainingSchema");
+const { PTO } = require("../schema/PTOSchema");
+const { PFRV } = require("../schema/PerformanceReviewSchema");
 
 // List the tasks
-app.get('/tasks', (req, res) => {
+app.get("/tasks", (req, res) => {
     // An array of company training tasks.
     TA.find({}).then((TAs) => {
         res.send(TAs);
@@ -35,7 +35,7 @@ app.get('/tasks', (req, res) => {
 });
 
 // Create company training tasks
-app.post('/tasks', (req, res) => {
+app.post("/tasks", (req, res) => {
     User.findOne({employeeId: req.body.employeeId}, (err, data) => {
         // Checks if the person with specific employeeId is a manager or not.
         // Only managers should have the permission to create company training tasks.
@@ -71,14 +71,14 @@ app.post('/tasks', (req, res) => {
             return res.json({
                 message: "This person is not a manager.",
                 data
-            })
+            });
         }
         
     });
 });
 
 // Create PTO requests
-app.post('/tasks', (req, res) => {
+app.post("/tasks", (req, res) => {
     User.findOne({employeeId: req.body.employeeId}, (err, data) => {
         // Checks if the person with specific employeeId is a manager or not.
         // Only managers should have the permission to create company training tasks.
@@ -115,14 +115,14 @@ app.post('/tasks', (req, res) => {
             return res.json({
                 message: "This person is not a manager.",
                 data
-            })
+            });
         }
         
     });
 });
 
 // Create PFRV requests
-app.post('/tasks', (req, res) => {
+app.post("/tasks", (req, res) => {
     User.findOne({employeeId: req.body.employeeId}, (err, data) => {
         // Checks if the person with specific employeeId is a manager or not.
         // Only managers should have the permission to create company training tasks.
@@ -159,7 +159,7 @@ app.post('/tasks', (req, res) => {
             return res.json({
                 message: "This person is not a manager.",
                 data
-            })
+            });
         }
         
     });
@@ -167,5 +167,5 @@ app.post('/tasks', (req, res) => {
 
 
 app.listen(3000, () => {
-    console.log('Listening on port 3000');
+    console.log("Listening on port 3000");
 });

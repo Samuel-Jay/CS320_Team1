@@ -6,15 +6,15 @@ const { config } = require("./config");
 const port = 5001;
 
 mongoose.connect(
-  `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
+    `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    }
 );
 mongoose.connection.on("error", (error) => console.log(error));
 mongoose.connection.once("open", () =>
-  console.log("Database connected successfully!")
+    console.log("Database connected successfully!")
 );
 mongoose.Promise = global.Promise;
 
@@ -32,12 +32,12 @@ app.use("/user", passport.authenticate("jwt", { session: false }), secureRoute);
 
 // Handle errors.
 app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ error: err });
+    res.status(err.status || 500);
+    res.json({ error: err });
 });
 
 app.listen(port, () => {
-  console.log(
-    `Server started at port ${port}, available at http://localhost:${port}.`
-  );
+    console.log(
+        `Server started at port ${port}, available at http://localhost:${port}.`
+    );
 });

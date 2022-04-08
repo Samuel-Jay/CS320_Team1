@@ -6,12 +6,12 @@ const TrainingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    assignerEmail: {
-      type: String,
+    assignerId: {
+      type: Number,
       required: true,
     },
-    assigneeEmail: {
-      type: String,
+    assigneeId: {
+      type: Number,
       required: true,
     },
     taskName: {

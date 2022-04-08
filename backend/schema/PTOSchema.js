@@ -5,12 +5,8 @@ const PTOSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    requestorEmail: {
-      type: String,
-      required: true,
-    },
-    managerEmail: {
-      type: String,
+    requestorId: {
+      type: Number,
       required: true,
     },
     managerId: {
@@ -30,10 +26,6 @@ const PTOSchema = new mongoose.Schema(
       required: true,
     },
     reason: {
-      type: String,
-      required: true,
-    },
-    dueDate: {
       type: String,
       required: true,
     },

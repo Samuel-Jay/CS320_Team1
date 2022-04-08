@@ -6,20 +6,23 @@ const ptoSchema = require("../schema/PTOSchema");
 const userSchema = require("../schema/UserSchema");
 const { companies } = require("../config");
 
-const generateHash = (key) => {
-  // var today = new Date();
-  // var date = (today.getMonth()+1) + '-' + today.getDate() + '-' + today.getFullYear();
-  // var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  // var dateTime = date + ' ' + time;
-  // var key = dateTime
+const generateHash = () => {
+  var today = new Date();
+  var date = `${
+    today.getUTCMonth() + 1
+  }-${today.getUTCDate()}-${today.getFullYear()}`;
+  var time = `${today.getUTCHours()}-${today.getUTCMinutes()}-${today.getUTCSeconds()}`;
+
+  var key = `${date} ${time}`;
   var hash = 0;
-  if (key.length == 0) return hash;
+
   for (i = 0; i < key.length; i++) {
     char = key.charCodeAt(i);
     hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
-  return hash;
+  //   return hash;
+  return Math.abs(hash);
 };
 
 router.get("/profile", (req, res, next) => {
@@ -37,46 +40,52 @@ router.post("/trainingTask/create", async (req, res, next) => {
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
 
-  await User.findOne({ employeeId: req.body.assignerId }).then(async (admin) => {
-    if (!admin) {
-      return res.json({ code: 404, message: "Assigner email doesn't exist" });
-    }
-    if (admin.positionTitle !== "CEO") {
-      return res.json({
-        code: 401,
-        message: "Assigner does not have Admin permissions",
-      });
-    }
-    await User.find({}).then((users) => {
-      employeeIds = users.filter((user) => user.positionTitle !== "CEO").map((user) => user.employeeId);
-      employeeIds.forEach(async (employeeId) => {
-        var taskData = {
-          taskId: Math.abs(
-            generateHash(
-              req.body.assignerId +
-              req.body.taskName +
-              req.body.startDate +
-              req.body.dueDate
-            )
-          ),
-          assignerId: req.body.assignerId,
-          assigneeId: employeeId,
-          taskName: req.body.taskName,
-          taskLink: req.body.taskLink,
-          taskDescription: req.body.taskDescription,
-          startDate: req.body.startDate,
-          dueDate: req.body.dueDate,
-          status: "Incomplete",
-        };
-        const trainingTask = await TrainingTask.create(taskData);
-        await trainingTask.save();
-      });
-      return res.json({
-        code: 200,
-        message: "Successfully added training tasks",
-      });
-    }).catch(error => {})
-  }).catch(error=> {});
+  await User.findOne({ employeeId: req.body.assignerId })
+    .then(async (admin) => {
+      if (!admin) {
+        return res.json({ code: 404, message: "Assigner email doesn't exist" });
+      }
+      if (admin.positionTitle !== "CEO") {
+        return res.json({
+          code: 401,
+          message: "Assigner does not have Admin permissions",
+        });
+      }
+      await User.find({})
+        .then((users) => {
+          employeeIds = users
+            .filter((user) => user.positionTitle !== "CEO")
+            .map((user) => user.employeeId);
+          employeeIds.forEach(async (employeeId) => {
+            var taskData = {
+              taskId: Math.abs(
+                generateHash(
+                  req.body.assignerId +
+                    req.body.taskName +
+                    req.body.startDate +
+                    req.body.dueDate
+                )
+              ),
+              assignerId: req.body.assignerId,
+              assigneeId: employeeId,
+              taskName: req.body.taskName,
+              taskLink: req.body.taskLink,
+              taskDescription: req.body.taskDescription,
+              startDate: req.body.startDate,
+              dueDate: req.body.dueDate,
+              status: "Incomplete",
+            };
+            const trainingTask = await TrainingTask.create(taskData);
+            await trainingTask.save();
+          });
+          return res.json({
+            code: 200,
+            message: "Successfully added training tasks",
+          });
+        })
+        .catch((error) => {});
+    })
+    .catch((error) => {});
 
   // try {
   //   const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
@@ -220,7 +229,8 @@ router.patch("/trainingTask/edit", async (req, res, next) => {
           {
             ...req.body,
           }
-        ).then(() => {
+        )
+          .then(() => {
             return res.json({
               code: 200,
               message: "Training Task updated successfully",
@@ -236,7 +246,7 @@ router.patch("/trainingTask/edit", async (req, res, next) => {
     });
 });
 
-router.delete("/trainingTask/delete", (req, res, next) => {
+router.delete("/trainingTask/delete", async (req, res, next) => {
   const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
   const TrainingTask = mongoose.connection
     .useDb(companyDB)
@@ -245,30 +255,32 @@ router.delete("/trainingTask/delete", (req, res, next) => {
   await TrainingTask.findOne({
     taskId: req.body.taskId,
     assignerId: req.body.assignerId,
-  }).then(task => {
-    if (!task) {
-      return res.json({
-        code: 404,
-        message: "No task with such credentials found",
-      });
-    }
-    await TrainingTask.deleteMany({
-      taskId: req.body.taskId,
-      assignerId: req.body.assignerId,
-    }).then(() => {
+  })
+    .then(async (task) => {
+      if (!task) {
         return res.json({
-          code: 200,
-          message: "Tasks deleted successfully",
+          code: 404,
+          message: "No task with such credentials found",
         });
+      }
+      await TrainingTask.deleteMany({
+        taskId: req.body.taskId,
+        assignerId: req.body.assignerId,
       })
-      .catch((err) => {
-        return res.json(err);
-      });
-  }).catch((err) => {
-    return res.json(err);
-  });
+        .then(() => {
+          return res.json({
+            code: 200,
+            message: "Tasks deleted successfully",
+          });
+        })
+        .catch((err) => {
+          return res.json(err);
+        });
+    })
+    .catch((err) => {
+      return res.json(err);
+    });
 
-  
   // try {
   //   const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
   //   const TrainingTask = mongoose.connection

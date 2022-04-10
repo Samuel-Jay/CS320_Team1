@@ -1,9 +1,11 @@
 // import './styles.css';
 // import background from './styles/img/background.png'
 
-import react from 'react'
+import * as React from 'react';
+import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
+import Typography from '@mui/material/Typography';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -38,6 +40,16 @@ const Searchbar = () => {
 		justifyContent: 'center',
 	}));
 
+	// const Toolbar = styled('div')(({ theme }) => ({
+	// 	padding: theme.spacing(0, 2),
+	// 	// height: '100%',
+	// 	position: 'static',
+	// 	// pointerEvents: 'none',
+	// 	display: 'block',
+	// 	alignItems: 'center',
+	// 	justifyContent: 'center',
+	// 	backgroundImage: 'background.png'
+	// }));
 
 	const StyledInputBase = styled(InputBase)(({ theme }) => ({
 		color: 'inherit',
@@ -67,6 +79,13 @@ const Searchbar = () => {
 					inputProps={{ 'aria-label': 'search' }}
 				  />
 				</Search>
+				<Typography
+            		variant="h6"
+            		noWrap
+            		component="div"
+            		sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+          		>
+          		</Typography>
 			  </Toolbar>
 			</AppBar>
 		</Box>

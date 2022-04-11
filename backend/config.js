@@ -1,8 +1,8 @@
 const config = {
-  username: "team1",
-  password: "team1project",
-  cluster: "cluster0.ba40p",
-  db: "Sonic-Bionics",
+    username: "team1",
+    password: "team1project",
+    cluster: "cluster0.ba40p",
+    db: "Sonic-Bionics",
 };
 
 const companies = new Map();

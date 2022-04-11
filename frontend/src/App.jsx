@@ -6,6 +6,17 @@ import Navbar from './components/Navbar/Navbar.jsx'
 import Searchbar from './components/Searchbar/Searchbar.jsx'
 import background from './styles/img/background.png'
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+
+
+
+const themeLight = createTheme({
+    palette: {
+        background: {
+            default: "#30cebb"
+        }
+    },
+});
 
 function App() {
 	return (

@@ -1,19 +1,20 @@
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const { config } = require("./config");
 const port = 5001;
 
 mongoose.connect(
-  `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
+    `mongodb+srv://${config.username}:${config.password}@${config.cluster}.mongodb.net/${config.db}?retryWrites=true&w=majority`,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    }
 );
 mongoose.connection.on("error", (error) => console.log(error));
 mongoose.connection.once("open", () =>
-  console.log("Database connected successfully!")
+    console.log("Database connected successfully!")
 );
 mongoose.Promise = global.Promise;
 
@@ -21,9 +22,8 @@ require("./auth/auth");
 
 const routes = require("./routes/routes");
 const secureRoute = require("./routes/secure-routes");
-
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 app.use("/api", routes);
 
@@ -32,12 +32,12 @@ app.use("/user", passport.authenticate("jwt", { session: false }), secureRoute);
 
 // Handle errors.
 app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ error: err });
+    res.status(err.status || 500);
+    res.json({ error: err });
 });
 
 app.listen(port, () => {
-  console.log(
-    `Server started at port ${port}, available at http://localhost:${port}.`
-  );
+    console.log(
+        `Server started at port ${port}, available at http://localhost:${port}.`
+    );
 });

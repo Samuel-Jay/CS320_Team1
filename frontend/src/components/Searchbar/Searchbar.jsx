@@ -48,7 +48,7 @@ const Searchbar = () => {
 	// 	display: 'block',
 	// 	alignItems: 'center',
 	// 	justifyContent: 'center',
-	// 	backgroundImage: 'background.png'
+	// 	background-image: 'background.png'
 	// }));
 
 	const StyledInputBase = styled(InputBase)(({ theme }) => ({

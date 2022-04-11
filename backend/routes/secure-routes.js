@@ -301,4 +301,96 @@ router.delete("/trainingTask/delete", async (req, res, next) => {
     });
 });
 
+router.post("/pto/edit", async (req, res, next) => {
+  const companyDB = companies.get(req.body.userEmail.split("@")[1]);
+  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
+  const TrainingTask = mongoose.connection
+    .useDb(companyDB)
+    .model("assignTraining", trainingSchema);
+  await User.findOne({ email: req.body.userEmail })
+    .then((user) => {
+      if (!user) {
+        return res.json({
+          code: 404,
+          status: "error",
+          message: "User does not exist",
+        });
+      }
+    })
+    .catch((error) => {
+      return res.json({
+        code: 404,
+        status: "error",
+        message: "User does not have access",
+      });
+    });
+});
+
+router.get("/pto/get", async (req, res, next) => {
+  const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
+  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
+  const TrainingTask = mongoose.connection
+    .useDb(companyDB)
+    .model("assignTraining", trainingSchema);
+
+  await User.findOne({ email: req.body.userEmail })
+    .then(async (user) => {
+      if (!user) {
+        return res.json({
+          code: 404,
+          status: "error",
+          message: "User not found",
+        });
+      }
+      userPTORequests = {};
+      await TrainingTask.find({ requestorId: user.employeeId })
+        .then((tasks) => {
+          if (!tasks) {
+            return res.json({
+              code: 404,
+              status: "error",
+              message: "No Paid Time Off Requests received for approval",
+            });
+          }
+          userPTORequests["received"] = tasks;
+        })
+        .catch((err) => {
+          return res.json({
+            code: 500,
+            status: "error",
+            message: err.message,
+          });
+        });
+      await TrainingTask.find({ approverId: user.managerId })
+        .then((tasks) => {
+          if (!tasks) {
+            return res.json({
+              code: 404,
+              status: "error",
+              message: "User has not made any Paid Time Off Requests",
+            });
+          }
+          userPTORequests["created"] = tasks;
+        })
+        .catch((err) => {
+          return res.json({
+            code: 500,
+            status: "error",
+            message: "Internal server error",
+          });
+        });
+      return res.json({
+        code: 200,
+        status: "success",
+        tasks: userPTORequests,
+      });
+    })
+    .catch((err) => {
+      return res.json({
+        code: 500,
+        status: "error",
+        message: "Internal server error",
+      });
+    });
+});
 module.exports = router;

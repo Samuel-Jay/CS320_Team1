@@ -5,7 +5,7 @@ import {useNavigate, useLocation} from 'react-router'
 import {useDispatch} from 'react-redux'
 
 function avatar(){
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')));
     const [showUserMenu, setShowUserMenu] = useState(null);

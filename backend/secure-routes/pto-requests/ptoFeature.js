@@ -30,7 +30,7 @@ module.exports = function(app) {
                 .useDb(companyDB)
                 .model("PTORequests", ptoSchema);
 
-            User.findOne({email: req.body.assigneeEmail}, async (err, user) => {
+            User.findOne({employeeId: req.body.employeeId}, async (err, user) => {
                 if (user.positionTitle == "CEO") {
                     return res.json({
                         message: "This user is not authorized to make PTO requests."

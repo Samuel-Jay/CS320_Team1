@@ -112,6 +112,7 @@ router.get("/trainingTask/get", async (req, res, next) => {
           if (!tasks) {
             return res.json({
               code: 404,
+              status: "error",
               message: "No assigned tasks found for the user",
             });
           }
@@ -120,6 +121,7 @@ router.get("/trainingTask/get", async (req, res, next) => {
         .catch((err) => {
           return res.json({
             code: 500,
+            status: "error",
             message: err.message,
           });
         });
@@ -128,6 +130,7 @@ router.get("/trainingTask/get", async (req, res, next) => {
           if (!tasks) {
             return res.json({
               code: 404,
+              status: "error",
               message: "User has not created any training tasks",
             });
           }
@@ -157,60 +160,89 @@ router.get("/trainingTask/get", async (req, res, next) => {
 
 router.patch("/trainingTask/edit", async (req, res, next) => {
   const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
+  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
   const TrainingTask = mongoose.connection
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
 
-  await TrainingTask.findOne({ taskId: req.body.taskId })
-    .then((task) => {
-      if (!task) {
+  await User.findOne({ email: req.body.requestorEmail })
+    .then(async (user) => {
+      if (!user) {
         return res.json({
           code: 404,
-          message: "No task with such credentials found",
+          status: "error",
+          message: "User does not exist",
         });
       }
-      if (req.body.requestorId === task.assignerId) {
-        TrainingTask.updateMany(
-          {
-            taskId: req.body.taskId,
-            assignerId: req.body.requestorId,
-          },
-          {
-            ...req.body,
-          }
-        )
-          .then(() => {
+      await TrainingTask.findOne({ taskId: req.body.taskId })
+        .then((task) => {
+          if (!task) {
             return res.json({
-              code: 200,
-              message: "Training Tasks updated successfully",
+              code: 404,
+              status: "error",
+              message: "No task found with such credentials",
             });
-          })
-          .catch((err) => {
-            return res.json({ message: error.message });
-          });
-      } else {
-        TrainingTask.updateOne(
-          {
-            taskId: req.body.taskId,
-            assigneeId: req.body.requestorId,
-          },
-          {
-            ...req.body,
           }
-        )
-          .then(() => {
-            return res.json({
-              code: 200,
-              message: "Training Task updated successfully",
-            });
-          })
-          .catch((error) => {
-            return res.json({ message: error.message });
+          if (user.employeeId === task.assignerId) {
+            TrainingTask.updateMany(
+              {
+                taskId: req.body.taskId,
+                assignerId: user.employeeId,
+              },
+              {
+                ...req.body,
+              }
+            )
+              .then(() => {
+                return res.json({
+                  code: 200,
+                  status: "success",
+                  message: "Training Tasks updated successfully",
+                });
+              })
+              .catch((err) => {
+                return res.json({
+                  code: 500,
+                  status: "error",
+                  message: "Internal server error",
+                });
+              });
+          } else {
+            TrainingTask.updateOne(
+              {
+                taskId: req.body.taskId,
+                assigneeId: user.employeeId,
+              },
+              {
+                ...req.body,
+              }
+            )
+              .then(() => {
+                return res.json({
+                  code: 200,
+                  status: "success",
+                  message: "Training Task updated successfully",
+                });
+              })
+              .catch((error) => {
+                return res.json({ message: error.message });
+              });
+          }
+        })
+        .catch((error) => {
+          return res.json({
+            code: 500,
+            status: "error",
+            message: "Internal server error",
           });
-      }
+        });
     })
-    .catch((error) => {
-      return res.json({ message: error.message });
+    .catch((err) => {
+      return res.json({
+        code: 500,
+        status: "error",
+        message: "Internal server error",
+      });
     });
 });
 
@@ -248,174 +280,6 @@ router.delete("/trainingTask/delete", async (req, res, next) => {
     .catch((err) => {
       return res.json(err);
     });
-
-  // try {
-  //   const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
-  //   const TrainingTask = mongoose.connection
-  //     .useDb(companyDB)
-  //     .model("assignTraining", trainingSchema);
-
-  //   TrainingTask.findOne(
-  //     {
-  //       taskId: req.body.taskId,
-  //       assignerEmail: req.body.assignerEmail,
-  //     },
-  //     (err, task) => {
-  //       if (!task) {
-  //         return res.json({
-  //           code: 404,
-  //           message: "No task with such credentials found",
-  //         });
-  //       }
-  //       TrainingTask.deleteMany({
-  //         taskId: req.body.taskId,
-  //         assignerEmail: req.body.assignerEmail,
-  //       })
-  //         .then(() => {
-  //           return res.json({
-  //             code: 200,
-  //             message: "Tasks deleted successfully",
-  //           });
-  //         })
-  //         .catch((err) => {
-  //           return res.json(err);
-  //         });
-  //     }
-  //   );
-  // } catch (error) {
-  //   return res.json(error);
-  // }
 });
-
-// router.post("/pto/create", (req, res, next) => {
-//   try {
-//     const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-//     const User = mongoose.connection
-//       .useDb(companyDB)
-//       .model("users", userSchema);
-//     const PTOTask = mongoose.connection
-//       .useDb(companyDB)
-//       .model("PTORequests", ptoSchema);
-
-//     User.findOne({ email: req.body.requestorEmail }, async (err, employee) => {
-//       if (!employee) {
-//         return res.json({ code: 404, message: "Employee not found" });
-//       }
-//       if (employee.positionTitle == "CEO") {
-//         return res.json({
-//           code: 401,
-//           message: "The CEO does not need to request for Paid Time Off",
-//         });
-//       }
-//       User.findOne({ email: req.body.managerEmail }, async (err, manager) => {
-//         if (!manager) {
-//           return res.json({ code: 404, message: "Manager not found" });
-//         }
-//         if (employee.managerId != manager.employeeId) {
-//           return res.json({
-//             code: 401,
-//             message: "Invalid Manager credentials",
-//           });
-//         }
-//         var taskData = {
-//           taskId: Math.abs(
-//             generateHash(employee.email + req.body.startDate + req.body.endDate)
-//           ),
-//           requestorEmail: req.body.requestorEmail,
-//           managerEmail: req.body.managerEmail,
-//           managerId: manager.managerId,
-//           title: req.body.title,
-//           startDate: req.body.startDate,
-//           endDate: req.body.endDate,
-//           reason: req.body.reason,
-//           status: "Pending",
-//         };
-
-//         const ptoRequest = await PTOTask.create(taskData);
-//         await ptoRequest.save();
-//         return res.json({
-//           code: 200,
-//           message: "Successfully added Paid Time Off Request",
-//         });
-//       });
-//     });
-//   } catch (error) {
-//     return res.json(error);
-//   }
-// });
-
-// router.patch("pto/edit", (req, res, next) => {
-//   try {
-//     const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-//     const PTOTask = mongoose.connection
-//       .useDb(companyDB)
-//       .model("PTORequests", ptoSchema);
-//     PTOTask.findOne(
-//       {
-//         taskId: req.body.taskId,
-//         requestorEmail: req.body.requestorEmail,
-//       },
-//       (err, task) => {
-//         if (!task) {
-//           return res.json({
-//             code: 404,
-//             message: "No task with such credentials found",
-//           });
-//         }
-//         PTOTask.updateOne(
-//           {
-//             taskId: req.body.taskId,
-//             requestorEmail: req.body.requestorEmail,
-//           },
-//           {
-//             ...req.body,
-//           }
-//         ).then(() => {
-//           return res.json({
-//             code: 200,
-//             message: "Paid Time Off Request updated successfully",
-//           });
-//         });
-//       }
-//     );
-//   } catch (error) {
-//     return res.json(error);
-//   }
-// });
-// router.delete("pto/delete", (req, res, next) => {
-//   try {
-//     const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-//     const PTOTask = mongoose.connection
-//       .useDb(companyDB)
-//       .model("PTORequests", ptoSchema);
-
-//     PTOTask.findOne({ taskId: req.body.taskId }, (err, task) => {
-//       if (!task) {
-//         return res.json({ code: 404, message: "Request not found" });
-//       }
-//       if (task.requestorEmail !== req.body.requestorEmail) {
-//         return res.json({
-//           code: 401,
-//           message: "User does not have deleting permissions",
-//         });
-//       }
-//       PTOTask.delete({
-//         taskId: req.body.taskId,
-//         requestorEmail: req.body.requestorEmail,
-//       })
-//         .then(() => {
-//           return res.json({
-//             code: 200,
-//             message: "Paid Time Off Request deleted successfully",
-//           });
-//         })
-//         .catch((err) => {
-//           return res.json(err);
-//         });
-//     });
-//   } catch (error) {
-//     return res.json(error);
-//   }
-// });
 
 module.exports = router;

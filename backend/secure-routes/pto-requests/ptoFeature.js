@@ -40,6 +40,7 @@ module.exports = function(app) {
                     taskId: Math.abs(generateHash()),
                     mangerEmail: req.body.mangerEmail,
                     managerId: req.body.managerId,
+                    employeeId: req.body.employeeId,
                     title: req.body.title,
                     startDate: req.body.startDate,
                     endDate: req.body.endDate,

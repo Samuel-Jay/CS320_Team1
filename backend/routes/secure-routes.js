@@ -99,13 +99,12 @@ router.post("/trainingTask/create", async (req, res, next) => {
 
 router.get("/trainingTask/get", async (req, res, next) => {
   const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-
   const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
   const TrainingTask = mongoose.connection
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
 
-  await User.findOne({ employeeEmail: req.body.requestorEmail })
+  await User.findOne({ email: req.body.requestorEmail })
     .then(async (user) => {
       userTrainingTasks = {};
       await TrainingTask.find({ assigneeId: user.employeeId })
@@ -137,12 +136,23 @@ router.get("/trainingTask/get", async (req, res, next) => {
         .catch((err) => {
           return res.json({
             code: 500,
-            message: err.message,
+            status: "error",
+            message: "Internal server error",
           });
         });
-      return res.json(userTrainingTasks);
+      return res.json({
+        code: 200,
+        status: "success",
+        tasks: userTrainingTasks,
+      });
     })
-    .catch((err) => {});
+    .catch((err) => {
+      return res.json({
+        code: 500,
+        status: "error",
+        message: "Internal server error",
+      });
+    });
 });
 
 router.patch("/trainingTask/edit", async (req, res, next) => {

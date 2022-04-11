@@ -13,6 +13,18 @@ function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:nu
         return state;
     case "GETTASK":
         return {...state, taskList: action.payload.received, sentList: action.payload.sent};
+    case "CHANGESTATUS":
+        console.log(action.payload)
+        const newList = state.taskList.map((task) =>{
+            if(task.taskId === action.payload.taskId){
+                let newTask = task
+                newTask.status = action.payload.status
+                return newTask
+            }else{
+                return task
+            }
+        })
+        return {...state, taskList: newList};
     default:
         return state;
     }

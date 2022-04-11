@@ -1,9 +1,12 @@
 import React, {useState} from "react";
+import {useDispatch} from "react-redux";
+import {changeStatus} from "../../../actions/Task.js"
 import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
 
 import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
 import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
 function Task(task){
+    const dispatch = useDispatch()
     const[background,setbackground] = useState("#ffff");
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -18,15 +21,15 @@ function Task(task){
         setbackground("#F0F2F5");
     }
 
-    function change_status(){}
+    function change_status(status){
+        dispatch(changeStatus({task, status}))
+    }
 
     function open_task(){
-        
     }
     return (
         <div className="EmailRow" style={{ backgroundColor: background }} onClick={open_task}>
-            <Checkbox defaultChecked size="small" onChange={change_status(task)} icon={<CircleCheckedOutline />} checkedIcon={<CircleUncheckedOutline />}>
-            </Checkbox>
+
             <h3 className=" EmailRow_title">
                 {task.task.taskName}
             </h3>
@@ -48,7 +51,7 @@ function Task(task){
                     aria-expanded={open ? "true" : undefined}
                     onClick={handleClick}
                 >
-                    Arch
+                    Change Status
                 </Button>
                 <Menu
                     id="basic-menu"
@@ -59,8 +62,9 @@ function Task(task){
                         "aria-labelledby": "basic-button",
                     }}
                 >
-                    <MenuItem onClick={change_status("archive")}>Archive</MenuItem>
-                    <MenuItem onClick={change_status("incomplete")}> Unarchive </MenuItem>
+                    <MenuItem onClick={() => {change_status("Archived")}}>Archive</MenuItem>
+                    <MenuItem onClick={() => {change_status("Incomplete")}}> Incomplete </MenuItem>
+                    <MenuItem onClick={() => {change_status("Completed")}}> Complete </MenuItem>
                 </Menu>
             </div>
         </div>

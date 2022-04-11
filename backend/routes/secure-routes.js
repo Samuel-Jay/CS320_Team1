@@ -247,38 +247,57 @@ router.patch("/trainingTask/edit", async (req, res, next) => {
 });
 
 router.delete("/trainingTask/delete", async (req, res, next) => {
-  const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
+  const companyDB = companies.get(req.body.userEmail.split("@")[1]);
+  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
   const TrainingTask = mongoose.connection
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
 
-  await TrainingTask.findOne({
-    taskId: req.body.taskId,
-    assignerId: req.body.assignerId,
-  })
-    .then(async (task) => {
-      if (!task) {
-        return res.json({
-          code: 404,
-          message: "No task with such credentials found",
-        });
-      }
-      await TrainingTask.deleteMany({
+  await User.findOne({ email: req.body.userEmail })
+    .then(async (user) => {
+      await TrainingTask.findOne({
         taskId: req.body.taskId,
-        assignerId: req.body.assignerId,
+        assignerId: user.employeeId,
       })
-        .then(() => {
-          return res.json({
-            code: 200,
-            message: "Tasks deleted successfully",
-          });
+        .then(async (task) => {
+          if (!task) {
+            return res.json({
+              code: 404,
+              message: "No task with such credentials found",
+            });
+          }
+          await TrainingTask.deleteMany({
+            taskId: req.body.taskId,
+            assignerId: user.employeeId,
+          })
+            .then(() => {
+              return res.json({
+                code: 200,
+                message: "All tasks deleted successfully",
+              });
+            })
+            .catch((err) => {
+              return res.json({
+                code: 500,
+                status: "error",
+                message: "Internal server error",
+              });
+            });
         })
         .catch((err) => {
-          return res.json(err);
+          return res.json({
+            code: 500,
+            status: "error",
+            message: "Internal server error",
+          });
         });
     })
     .catch((err) => {
-      return res.json(err);
+      return res.json({
+        code: 404,
+        status: "error",
+        message: "User does not have access",
+      });
     });
 });
 

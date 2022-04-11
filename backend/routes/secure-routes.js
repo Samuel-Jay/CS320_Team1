@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const trainingSchema = require("../schema/TrainingSchema");
-const ptoSchema = require("../schema/PTOSchema");
 const userSchema = require("../schema/UserSchema");
 const { companies } = require("../config");
 
@@ -40,34 +39,31 @@ router.post("/trainingTask/create", async (req, res, next) => {
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
 
-  await User.findOne({ employeeId: req.body.assignerId })
+  await User.findOne({ email: req.body.assignerEmail })
     .then(async (admin) => {
       if (!admin) {
-        return res.json({ code: 404, message: "Assigner email doesn't exist" });
+        return res.json({
+          code: 404,
+          status: "error",
+          message: "Assigner email doesn't exist",
+        });
       }
       if (admin.positionTitle !== "CEO") {
         return res.json({
           code: 401,
+          status: "error",
           message: "Assigner does not have Admin permissions",
         });
       }
       await User.find({})
         .then((users) => {
-          employeeIds = users
-            .filter((user) => user.positionTitle !== "CEO")
-            .map((user) => user.employeeId);
-          employeeIds.forEach(async (employeeId) => {
+          employees = users.filter((user) => user.positionTitle !== "CEO");
+
+          employees.forEach(async (employee) => {
             var taskData = {
-              taskId: Math.abs(
-                generateHash(
-                  req.body.assignerId +
-                    req.body.taskName +
-                    req.body.startDate +
-                    req.body.dueDate
-                )
-              ),
-              assignerId: req.body.assignerId,
-              assigneeId: employeeId,
+              taskId: generateHash(),
+              assignerId: admin.employeeId,
+              assigneeId: employee.employeeId,
               taskName: req.body.taskName,
               taskLink: req.body.taskLink,
               taskDescription: req.body.taskDescription,
@@ -80,111 +76,73 @@ router.post("/trainingTask/create", async (req, res, next) => {
           });
           return res.json({
             code: 200,
+            status: "success",
             message: "Successfully added training tasks",
           });
         })
-        .catch((error) => {});
+        .catch((error) => {
+          return res.json({
+            code: 500,
+            status: "error",
+            message: "Internal server error",
+          });
+        });
     })
-    .catch((error) => {});
-
-  // try {
-  //   const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
-  //   const User = mongoose.connection
-  //     .useDb(companyDB)
-  //     .model("users", userSchema);
-  //   const TrainingTask = mongoose.connection
-  //     .useDb(companyDB)
-  //     .model("assignTraining", trainingSchema);
-
-  //   User.findOne({ email: req.body.assignerEmail }, async (err, admin) => {
-  //     if (!admin) {
-  //       return res.json({ code: 404, message: "Assigner email doesn't exist" });
-  //     }
-  //     if (admin.positionTitle !== "CEO") {
-  //       return res.json({
-  //         code: 401,
-  //         message: "Assigner does not have Admin permissions",
-  //       });
-  //     }
-  //     User.find({}, async (err, users) => {
-  //       emails = users
-  //         .filter((user) => user.positionTitle !== "CEO")
-  //         .map((user) => user.email);
-  //       emails.forEach(async (email) => {
-  //         var taskData = {
-  //           taskId: Math.abs(
-  //             generateHash(
-  //               req.body.assignerEmail +
-  //                 req.body.taskName +
-  //                 req.body.taskLink +
-  //                 req.body.startDate +
-  //                 req.body.dueDate
-  //             )
-  //           ),
-  //           assignerEmail: req.body.assignerEmail,
-  //           assigneeEmail: email,
-  //           taskName: req.body.taskName,
-  //           taskLink: req.body.taskLink,
-  //           taskDescription: req.body.taskDescription,
-  //           startDate: req.body.startDate,
-  //           dueDate: req.body.dueDate,
-  //           status: "Incomplete",
-  //         };
-  //         const trainingTask = await TrainingTask.create(taskData);
-  //         await trainingTask.save();
-  //       });
-  //       return res.json({
-  //         code: 200,
-  //         message: "Successfully added training tasks",
-  //       });
-  //     });
-  //   });
-  // } catch (error) {
-  //   return res.json(error);
-  // }
+    .catch((error) => {
+      return res.json({
+        code: 500,
+        status: "error",
+        message: "Internal server error",
+      });
+    });
 });
 
 router.get("/trainingTask/get", async (req, res, next) => {
   const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
+
+  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
   const TrainingTask = mongoose.connection
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
-  userTrainingTasks = {};
 
-  await TrainingTask.find({ assigneeId: req.body.requestorId })
-    .then((tasks) => {
-      if (!tasks) {
-        return res.json({
-          code: 404,
-          message: "No assigned tasks found for the user",
+  await User.findOne({ employeeEmail: req.body.requestorEmail })
+    .then(async (user) => {
+      userTrainingTasks = {};
+      await TrainingTask.find({ assigneeId: user.employeeId })
+        .then((tasks) => {
+          if (!tasks) {
+            return res.json({
+              code: 404,
+              message: "No assigned tasks found for the user",
+            });
+          }
+          userTrainingTasks["received"] = tasks;
+        })
+        .catch((err) => {
+          return res.json({
+            code: 500,
+            message: err.message,
+          });
         });
-      }
-      userTrainingTasks["received"] = tasks;
-    })
-    .catch((err) => {
-      return res.json({
-        code: 500,
-        message: err.message,
-      });
-    });
-
-  await TrainingTask.find({ assigneeId: req.body.requestorId })
-    .then((tasks) => {
-      if (!tasks) {
-        return res.json({
-          code: 404,
-          message: "User has not created any training tasks",
+      await TrainingTask.find({ assignerId: user.employeeId })
+        .then((tasks) => {
+          if (!tasks) {
+            return res.json({
+              code: 404,
+              message: "User has not created any training tasks",
+            });
+          }
+          userTrainingTasks["created"] = tasks;
+        })
+        .catch((err) => {
+          return res.json({
+            code: 500,
+            message: err.message,
+          });
         });
-      }
-      userTrainingTasks["created"] = tasks;
+      return res.json(userTrainingTasks);
     })
-    .catch((err) => {
-      return res.json({
-        code: 500,
-        message: err.message,
-      });
-    });
-  return res.json(userTrainingTasks);
+    .catch((err) => {});
 });
 
 router.patch("/trainingTask/edit", async (req, res, next) => {

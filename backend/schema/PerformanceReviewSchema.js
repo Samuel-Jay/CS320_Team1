@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const PerformanceReview = new mongoose.Schema(
     {
-        reviewerEmail: {
-            type: String,
+        reviewerId: {
+            type: Number,
             required: true,
         },
-        revieweeEmail: {
-            type: String,
+        revieweeId: {
+            type: Number,
             required: true,
         },
         companyId: {

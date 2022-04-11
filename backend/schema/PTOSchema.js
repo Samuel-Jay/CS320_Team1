@@ -9,7 +9,7 @@ const PTOSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        mangerEmail: {
+        managerEmail: {
             type: String,
             required: true,
         },

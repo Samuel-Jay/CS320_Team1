@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const PerformanceReview = new mongoose.Schema(
   {
     reviewerId: {
-      type: String,
+      type: Number,
       required: true,
     },
     revieweeId: {
-      type: String,
+      type: Number,
       required: true,
     },
     overallComments: {

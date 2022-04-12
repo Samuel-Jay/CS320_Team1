@@ -56,3 +56,19 @@ export const getTrainingTask = () => async(dispatch) => {
         console.log(err);
     }
 };
+
+export const openTask = (task) => async(dispatch) => {
+    try{
+        dispatch({type: "OPENTASK", payload: task})
+    }catch(err){
+        console.log(err);
+    }
+};
+
+export const closeTask = () => async(dispatch) => {
+    try{
+        dispatch({type: "CLOSETASK"})
+    }catch(err){
+        console.log(err);
+    }
+};

@@ -8,6 +8,8 @@ function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:nu
         return { ...state, category:"ARCHIVE"};
     case "OPENTASK":
         return { ...state,  openTask: action.payload};
+    case "CLOSETASK":
+        return { ...state,  openTask: null};
     case "GETEMPLOYEE":
         localStorage.setItem("employees", JSON.stringify(action.payload.employees));
         return state;

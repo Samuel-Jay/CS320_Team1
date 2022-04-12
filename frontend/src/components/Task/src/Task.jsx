@@ -1,11 +1,16 @@
 import React, {useState} from "react";
+import {useDispatch} from "react-redux";
+import {openTask} from "../../../actions/Task.js";
 import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
 
 import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
 import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
+
 function Task(task){
+    const dispatch = useDispatch();
     const[background,setbackground] = useState("#ffff");
     const [anchorEl, setAnchorEl] = useState(null);
+    const [openWindow, setOpenWindow] = useState(null);
     const open = Boolean(anchorEl);
     function handleClose(){
         setAnchorEl(null);
@@ -17,15 +22,9 @@ function Task(task){
     function change_background(){
         setbackground("#F0F2F5");
     }
-
     function change_status(){}
     function handleWindow(task){
-        console.log("chichke");
-        return( <Window task={task}/>);
-    }
-    function open_task(){
-
-        
+        dispatch(openTask(task.task));
     }
     return (
         <div className="EmailRow" style={{ backgroundColor: '#FFFFFF' }} onClick={()=>{handleWindow(task)}}>
@@ -45,9 +44,8 @@ function Task(task){
             <div className="time">
                 {task.task.dueDate.split("T")[0].split("-")[1]+"/"+task.task.dueDate.split("T")[0].split("-")[2]+"/"+task.task.dueDate.split("T")[0].split("-")[0]}
             </div>
-        
         </div>
-    );
+    )
 }
 
 export default Task;

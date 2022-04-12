@@ -1,7 +1,3 @@
-@font-face {
-    font-family: robot;
-    src: url(/Roboto/Roboto-Regular.ttf);
-  }
 .Display_box{
     display: flex;
     flex-direction: column;

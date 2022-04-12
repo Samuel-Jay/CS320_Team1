@@ -5,6 +5,8 @@ import { Menu, MenuItem, Typography, Toolbar, AppBar, Box, Button, IconButton } 
 import {Link } from 'react-router-dom'
 import  Avatar from './Avatar.jsx'
 import TaskForm from '../TaskForm/TaskForm.jsx'
+import iconButton from '@mui/material/IconButton';
+import logo from '../../styles/img/logo.png';
 
 function Navbar(){
     const dispatch = useDispatch();
@@ -15,16 +17,14 @@ function Navbar(){
         setUser(JSON.parse(localStorage.getItem('profile')));
     },[location, dispatch]);
     return(
-        <AppBar position="sticky" variant="dense">
+        <AppBar position="sticky" variant="dense" style={{ background: '#199086' }}>
 	    <Toolbar>
-	        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' } }}>
-                    <MenuItem key="UKG" onClick={() => {navigate("/")}}>
-                        <Typography variant="h6" textAlign="center">UKG</Typography>
-                    </MenuItem>
-	        </Box>
+            <img src={logo} width="100" ></img>
+            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' } }}>
+            </Box>
 	        {
 		    user===null ? (
-			<Button component={Link} to={"/login"} variant="contained" color="primary">Sign In</Button>
+			<Button component={Link} to={"/login"} variant="contained" style={{ background: '#005151' }}>Sign In</Button>
 		    ) : (
                         <>
                             <TaskForm/>
@@ -37,3 +37,5 @@ function Navbar(){
     )
 }
 export default Navbar;
+
+

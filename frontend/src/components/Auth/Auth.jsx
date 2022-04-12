@@ -7,6 +7,12 @@ import {signin} from "../../actions/User.js";
 import {useNavigate} from "react-router-dom";
 import {getEmployees} from "../../actions/Task.js";
 
+const CoolTypography = withStyles({
+    root: {
+      color: "#005151"
+    }
+  })(Typography);
+  
 function Auth(){
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -53,7 +59,7 @@ function Auth(){
                         <Grid container spacing={2} aign="center" justifyContent="center">
                             <img src={logo} alt={logo} width={100} height={100} align="center"/>
                         </Grid>
-                        <Typography align="center" variant="h5">{isSignup ? "Sign Up" : "Sign in"}</Typography>
+                        <CoolTypography align="center" variant="h5" >{isSignup ? "Sign Up" : "Sign in"}</CoolTypography>
                         {isSignup && (
                             <>
                                 <Grid container >
@@ -75,7 +81,7 @@ function Auth(){
                         )}
                         <Grid>
                             <div/>
-                            <Button type="submit" align="center" variant="contained" fullWidth>{isSignup?"Sign Up": "Sign In"}</Button>
+                            <Button type="submit" align="center" variant="contained" style={{background: "#005151" }} fullWidth>{isSignup?"Sign Up": "Sign In"} </Button>
                             <Button align="center" onClick={toggleSignup}>{isSignup ? "Already have an account? Sign in":"Don't have an account? Sign up"}</Button>
                             {
                                 hasFailed && (

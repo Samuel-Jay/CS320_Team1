@@ -1,36 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const trainingSchema = require("../schema/TrainingSchema");
-const userSchema = require("../schema/UserSchema");
-const { companies } = require("../config");
-
-const generateHash = () => {
-  var today = new Date();
-  var date = `${
-    today.getUTCMonth() + 1
-  }-${today.getUTCDate()}-${today.getFullYear()}`;
-  var time = `${today.getUTCHours()}-${today.getUTCMinutes()}-${today.getUTCSeconds()}`;
-
-  var key = `${date} ${time}`;
-  var hash = 0;
-
-  for (i = 0; i < key.length; i++) {
-    char = key.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  //   return hash;
-  return Math.abs(hash);
-};
-
-router.get("/profile", (req, res, next) => {
-  res.json({
-    message: "You made it to the secure route",
-    user: req.user,
-    token: req.query.secret_token,
-  });
-});
+const trainingSchema = require("../../schema/TrainingSchema");
+const userSchema = require("../../schema/UserSchema");
+const { companies } = require("../../config");
+const generateHash = require("../../utils/hashIdGenerator");
 
 router.post("/trainingTask/create", async (req, res, next) => {
   const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
@@ -301,96 +275,4 @@ router.delete("/trainingTask/delete", async (req, res, next) => {
     });
 });
 
-router.post("/pto/edit", async (req, res, next) => {
-  const companyDB = companies.get(req.body.userEmail.split("@")[1]);
-  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
-  const TrainingTask = mongoose.connection
-    .useDb(companyDB)
-    .model("assignTraining", trainingSchema);
-  await User.findOne({ email: req.body.userEmail })
-    .then((user) => {
-      if (!user) {
-        return res.json({
-          code: 404,
-          status: "error",
-          message: "User does not exist",
-        });
-      }
-    })
-    .catch((error) => {
-      return res.json({
-        code: 404,
-        status: "error",
-        message: "User does not have access",
-      });
-    });
-});
-
-router.get("/pto/get", async (req, res, next) => {
-  const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-  const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
-  const TrainingTask = mongoose.connection
-    .useDb(companyDB)
-    .model("assignTraining", trainingSchema);
-
-  await User.findOne({ email: req.body.userEmail })
-    .then(async (user) => {
-      if (!user) {
-        return res.json({
-          code: 404,
-          status: "error",
-          message: "User not found",
-        });
-      }
-      userPTORequests = {};
-      await TrainingTask.find({ requestorId: user.employeeId })
-        .then((tasks) => {
-          if (!tasks) {
-            return res.json({
-              code: 404,
-              status: "error",
-              message: "No Paid Time Off Requests received for approval",
-            });
-          }
-          userPTORequests["received"] = tasks;
-        })
-        .catch((err) => {
-          return res.json({
-            code: 500,
-            status: "error",
-            message: err.message,
-          });
-        });
-      await TrainingTask.find({ approverId: user.managerId })
-        .then((tasks) => {
-          if (!tasks) {
-            return res.json({
-              code: 404,
-              status: "error",
-              message: "User has not made any Paid Time Off Requests",
-            });
-          }
-          userPTORequests["created"] = tasks;
-        })
-        .catch((err) => {
-          return res.json({
-            code: 500,
-            status: "error",
-            message: "Internal server error",
-          });
-        });
-      return res.json({
-        code: 200,
-        status: "success",
-        tasks: userPTORequests,
-      });
-    })
-    .catch((err) => {
-      return res.json({
-        code: 500,
-        status: "error",
-        message: "Internal server error",
-      });
-    });
-});
 module.exports = router;

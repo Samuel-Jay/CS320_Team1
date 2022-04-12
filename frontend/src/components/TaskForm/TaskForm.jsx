@@ -41,11 +41,13 @@ export default function FormDialog() {
 
     return (
         <div>
-            <Button  color="secondary" variant="contained" onClick={handleClickOpen}>
+            <Button   variant="contained" sx={{backgroundColor: '#005151'}} onClick={handleClickOpen}>
                 Create Task
         </Button>
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Create Task</DialogTitle>
+                <DialogTitle>
+                    <span style={{color: '#005151'}}>Create Task</span>
+                    </DialogTitle>
                 <DialogContent>
 
                     <FormControl sx={{ m: 1, width: 300 }}>

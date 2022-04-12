@@ -24,9 +24,8 @@ function Task(task){
         
     }
     return (
-        <div className="EmailRow" style={{ backgroundColor: background }} onClick={open_task}>
-            <Checkbox defaultChecked size="small" onChange={change_status(task)} icon={<CircleCheckedOutline />} checkedIcon={<CircleUncheckedOutline />}>
-            </Checkbox>
+        <div className="EmailRow" style={{ backgroundColor: '#EBF2F1' }} onClick={open_task}>
+            <Checkbox  size="small" onChange={change_status(task)} style ={{color: "#199086",}}  />
             <h3 className=" EmailRow_title">
                 {task.task.taskName}
             </h3>

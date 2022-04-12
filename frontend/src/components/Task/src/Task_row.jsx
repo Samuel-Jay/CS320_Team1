@@ -1,7 +1,5 @@
 import { Checkbox } from '@mui/material';
 import "./Task_row.css";
-import CircleCheckedOutline from "@mui/icons-material/CheckCircle"
-import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked"
 import { color } from '@mui/system';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -32,7 +30,10 @@ const Task_row = () => {
         backgroundColor: background,
         padding: 10,
     };
-
+    function handleWindow(task){
+        console.log("chichke");
+        return( <Window task={task}/>);
+    }
     const taskList=useSelector((state ) => state.task.taskList);
     return(
         <>
@@ -47,7 +48,7 @@ const Task_row = () => {
 
                     {
                         return(
-                            <Task key={task._id} task={task}/>
+                            <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                         )
                     }):( <></>
                        )

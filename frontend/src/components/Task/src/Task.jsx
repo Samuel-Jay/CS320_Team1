@@ -19,49 +19,33 @@ function Task(task){
     }
 
     function change_status(){}
-
+    function handleWindow(task){
+        console.log("chichke");
+        return( <Window task={task}/>);
+    }
     function open_task(){
+
         
     }
     return (
-        <div className="EmailRow" style={{ backgroundColor: '#EBF2F1' }} onClick={open_task}>
+        <div className="EmailRow" style={{ backgroundColor: '#FFFFFF' }} onClick={()=>{handleWindow(task)}}>
             <Checkbox  size="small" onChange={change_status(task)} style ={{color: "#199086",}}  />
             <h3 className=" EmailRow_title">
-                {task.task.taskName}
+                {task.task.assignerEmail}
             </h3>
             <div className="EmailRow_Subject">
+                
                 <h4>
+                    {task.task.taskName+":"}
                     <span className="EmailRow_Description">
                         {task.task.taskDescription}
                     </span>
                 </h4>
             </div>
             <div className="time">
-                {task.task.dueDate}
+                {task.task.dueDate.split("T")[0].split("-")[1]+"/"+task.task.dueDate.split("T")[0].split("-")[2]+"/"+task.task.dueDate.split("T")[0].split("-")[0]}
             </div>
-            <div>
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? "basic-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                    onClick={handleClick}
-                >
-                    Arch
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                    MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                    }}
-                >
-                    <MenuItem onClick={change_status("archive")}>Archive</MenuItem>
-                    <MenuItem onClick={change_status("incomplete")}> Unarchive </MenuItem>
-                </Menu>
-            </div>
+        
         </div>
     );
 }

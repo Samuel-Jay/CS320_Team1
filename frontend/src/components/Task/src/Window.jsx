@@ -13,9 +13,9 @@ function Window (task){
             <div className='Description'>
                 <p>{task.task.taskDescription}</p>
             </div>
-            <dov className="Details">
+            <div className="Details">
             <h5>{"Details:"}</h5>
-            </dov>
+            </div>
         </div>
     )
 

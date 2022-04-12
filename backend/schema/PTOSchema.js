@@ -1,43 +1,41 @@
 const mongoose = require("mongoose");
-const PTOSchema = new mongoose.Schema(
-  {
-    taskId: {
-      type: Number,
-      required: true,
-    },
-    requestorId: {
-      type: Number,
-      required: true,
-    },
-    managerId: {
-      type: Number,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    startDate: {
-      type: Date,
-      required: true,
-    },
-    endDate: {
-      type: Date,
-      required: true,
-    },
-    reason: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: String,
-      required: true,
-    },
+const PTOSchema = new mongoose.Schema({
+  taskId: {
+    type: Number,
+    required: true,
   },
-  {
-    timestamps: true,
-    collection: "PTORequests",
-  }
-);
+  managerId: {
+    type: Number,
+    required: true,
+  },
+  employeeId: {
+    type: Number,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+  },
+  dueDate: {
+    type: Date,
+    required: true,
+  },
+  reason: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    required: true,
+  },
+});
 
 module.exports = PTOSchema;

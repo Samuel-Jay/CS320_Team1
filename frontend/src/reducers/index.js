@@ -1,7 +1,7 @@
-import {combineReducers} from 'redux'
+import {combineReducers} from "redux";
 
-import user from './User.js'
+import user from "./User.js";
+import task from "./Task.js";
+const reducers = combineReducers({user, task});
 
-const reducers = combineReducers({user});
-
-export default reducers
+export default reducers;

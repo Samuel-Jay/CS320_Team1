@@ -43,7 +43,7 @@ router.post("/pto/edit", async (req, res, next) => {
 });
 
 router.get("/pto/get", async (req, res, next) => {
-  const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
+  const companyDB = companies.get(req.body.userEmail.split("@")[1]);
   const UserModel = mongoose.connection
     .useDb(companyDB)
     .model("users", userSchema);
@@ -60,6 +60,7 @@ router.get("/pto/get", async (req, res, next) => {
           message: "Invalid user credentials",
         });
       }
+      return user;
     })
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });

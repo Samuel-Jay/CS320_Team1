@@ -22,24 +22,45 @@ router.post("/pto/edit", async (req, res, next) => {
           message: "Invalid user credentials",
         });
       }
+      return user;
     })
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });
     });
 
-  let ptoRequest = await PTORequest.findOne({ taskId: req.body.taskId })
-    .then((ptoRequest) => {
-      if (!ptoRequest) {
-        return res.json({
-          code: 404,
-          status: "error",
-          message: "Paid Time Off Request does not exist",
-        });
-      }
-    })
-    .catch((error) => {
-      return res.json({ code: 500, status: "error", message: error.message });
-    });
+  // let ptoRequest = await PTORequest.findOne({ taskId: req.body.taskId })
+  //   .then((ptoRequest) => {
+  //     if (!ptoRequest) {
+  //       return res.json({
+  //         code: 404,
+  //         status: "error",
+  //         message: "Paid Time Off Request does not exist",
+  //       });
+  //     }
+  //     return ptoRequest;
+  //   })
+  //   .catch((error) => {
+  //     return res.json({ code: 500, status: "error", message: error.message });
+  //   });
+
+  // if (
+  //   ptoRequest.employeeId === user.employeeId &&
+  //   ptoRequest.status === "pending"
+  // ) {
+  //   await PTORequest.updateOne({ taskId: req.body.taskId });
+  // } else if (ptoRequest.managerId === user.employeeId) {
+  // } else {
+  //   return res.json({
+  //     code: 404,
+  //     status: "error",
+  //     message: "User does not have accees to update the Paid Time Off Request",
+  //   });
+  // }
+  // return res.json({
+  //   code: 200,
+  //   status: "success",
+  //   message: "Paid Time Off Request updated Successfully",
+  // });
 });
 
 router.get("/pto/get", async (req, res, next) => {
@@ -65,7 +86,6 @@ router.get("/pto/get", async (req, res, next) => {
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });
     });
-
   userPTORequests = {};
 
   userPTORequests["created"] = await PTORequestModel.find({

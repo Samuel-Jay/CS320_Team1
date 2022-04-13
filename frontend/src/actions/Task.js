@@ -72,3 +72,11 @@ export const closeTask = () => async(dispatch) => {
         console.log(err);
     }
 };
+
+export const searchTask = (query) => async(dispatch) => {
+    try{
+        dispatch({type: "SEARCHTASK", payload: query})
+    }catch(err){
+        console.log(err);
+    }
+};

@@ -31,7 +31,6 @@ const Task_row = () => {
         padding: 10,
     };
     function handleWindow(task){
-        console.log("chichke");
         return( <Window task={task}/>);
     }
     const taskList=useSelector((state ) => state.task.taskList);
@@ -45,7 +44,6 @@ const Task_row = () => {
             </List>
             { 
                 show==="All"?taskList.map(task=>
-
                     {
                         return(
                             <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>

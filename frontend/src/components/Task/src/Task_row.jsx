@@ -27,7 +27,7 @@ const Task_row = () => {
     const flexContainer ={
         display:'flex',
         flexDirection: 'row',
-        backgroundColor: background,
+        backgroundColor: '#FFFFFF',
         padding: 10,
     };
     function handleWindow(task){

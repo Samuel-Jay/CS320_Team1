@@ -8,6 +8,7 @@ import TaskForm from '../TaskForm/TaskForm.jsx'
 import iconButton from '@mui/material/IconButton';
 import logo from '../../styles/img/logo.png';
 import Searchbar from '../Searchbar/Searchbar.jsx'
+import { shadows } from '@mui/system';
 
 function Navbar(){
     const dispatch = useDispatch();
@@ -18,7 +19,7 @@ function Navbar(){
         setUser(JSON.parse(localStorage.getItem('profile')));
     },[location, dispatch]);
     return(
-        <AppBar position="sticky" variant="dense" style={{ background: '#199086' }}>
+        <AppBar position="sticky" variant="dense" style={{ background: '#199086' }}  sx={{ boxShadow: 3 }}>
 	    <Toolbar>
                 <img src={logo} width="100" ></img>
                 <Searchbar/>

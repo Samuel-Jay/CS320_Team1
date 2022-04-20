@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const pfrvSchema = require("../schema/PerformanceReviewSchema");
+const PerformanceReviewSchema = require("../schema/PerformanceReviewSchema");
 const userSchema = require("../schema/UserSchema");
 const { companies } = require("../config");
+const { isUndefined } = require("util");
 
 // const generateHash = (key) => {
 //     var hash = 0;
@@ -77,31 +78,28 @@ router.post('/performanceReview/create', (req, res, next) => {
             .useDb(companyDB)
             .model("PerformanceReviews", PerformanceReviewSchema);
 
-        User.findOne({ employeeId: req.body.employeeId }, async (err, user) => {
-            if (req.body.reviewerId != user.managerId && req.body.revieweeId != user.managerId) {
+        await User.findOne({ email: req.body.email }, async (err, user) => {
+            let allowed = User.find({managerId: user.managerId});
+            if (!allowed.includes(req.body.reviewerId) &&
+            !allowed.includes(req.body.revieweeId)) {
                 return res.json({
-                    message: "No authorization to write reviews about this user."
+                    message: "Cannot request review from an employee who isn't your peer."
                 });
             }
-            if (len(req.body.overallComments) == 0) {
+            else if (!User.find({managerId: user.employeeId}.includes(req.body.reviewerId)) ||
+            (req.body.revieweeId != user.managerId)) {
                 return res.json({
-                    message: "Cannot provide unjustified rating score."
+                    message: "Cannot request review from employee who isn't peer or subordinate."
                 });
             }
-            if (len(req.body.growthFeedback) == 0) {
-                return res.json({
-                    message: "Cannot provide unjustified rating score."
-                });
+            else if (req.body.growthFeedbackScore != undefined) {
+                return res.json({message:"Cannot review yourself."});
             }
-            if (len(req.body.kindnessFeedback) == 0) {
-                return res.json({
-                    message: "Cannot provide unjustified rating score."
-                });
+            else if (req.body.kindnessFeedbackScore != undefined) {
+                return res.json({message:"Cannot review yourself."});
             }
-            if (len(req.body.deliveryFeedback) == 0) {
-                return res.json({
-                    message: "Cannot provide unjustified rating score."
-                });
+            else if (req.body.deliveryFeedbackScore != undefined) {
+                return res.json({message:"Cannot review yourself."});
             }
             var taskData = {
                 taskId: Math.abs(generateHash()),
@@ -131,141 +129,61 @@ router.post('/performanceReview/create', (req, res, next) => {
     }
 });
 
-router.post("/trainingTask/create", (req, res, next) => {
+router.post("/performanceReview/get", async (req, res, next) => {
+    const companyDB = companies.get(req.body.Email.split("@")[1]);
+    const User = mongoose.connection
+            .useDb(companyDB)
+            .model("users", userSchema);
+    const PerformanceReview = mongoose.connection
+        .useDb(companyDB)
+        .model("PerformanceReviews", PerformanceReviewSchema);
+    userPerformanceReviews = {};
+    await PerformanceReview.find({ taskId: req.body.taskId })
+        .then((tasks) => {
+            if (!tasks) {
+                return res.json({
+                    code: 404,
+                    message: "No reviews found for the user to do.",
+                });
+            }
+            userPerformanceReviews["received"] = tasks;
+        })
+        .catch((err) =>
+            res.json({
+                code: 500,
+                message: err.message,
+            })
+        );
+    await PerformanceReview.find({ taskId: req.body.taskId })
+        .then((tasks) => {
+            if (!tasks) {
+                return res.json({
+                    code: 404,
+                    message: "User has not created any performance reviews",
+                });
+            }
+            userPerformanceReviews["created"] = tasks;
+        })
+        .catch((err) =>
+            res.json({
+                code: 500,
+                message: err.message,
+            })
+        );
+    return res.json(userPerformanceReviews);
+});
+
+router.patch("/PerformanceReview/edit", (req, res, next) => {
     try {
-        const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
+        const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const User = mongoose.connection
             .useDb(companyDB)
             .model("users", userSchema);
-        const TrainingTask = mongoose.connection
+        const PerformanceReview = mongoose.connection
             .useDb(companyDB)
-            .model("assignTraining", trainingSchema);
+            .model("performanceReview", pfrvSchema);
 
-        User.findOne({ email: req.body.assignerEmail }, async (err, admin) => {
-            if (!admin) {
-                return res.json({ code: 404, message: "Assigner email doesn't exist" });
-            }
-            if (!admin.isManager) {
-                return res.json({
-                    code: 401,
-                    message: "Assigner does not have Admin permissions",
-                });
-            }
-            if(req.body.assigneeEmail = "all"){
-                User.find({}, async (err, users) => {
-                    emails = users
-                        .filter((user) => user.positionTitle !== "CEO")
-                        .map((user) => user.email);
-                    emails.forEach(async (email) => {
-                        var taskData = {
-                            taskId: Math.abs(
-                                generateHash(
-                                    req.body.taskName +
-                                        req.body.taskLink +
-                                        req.body.startDate +
-                                        req.body.dueDate
-                                )
-                            ),
-                            assignerEmail: req.body.assignerEmail,
-                            assigneeEmail: email,
-                            taskName: req.body.taskName,
-                            taskLink: req.body.taskLink,
-                            taskDescription: req.body.taskDescription,
-                            startDate: req.body.startDate,
-                            dueDate: req.body.dueDate,
-                            status: "Incomplete",
-                        };
-                        const trainingTask = await TrainingTask.create(taskData);
-                        await trainingTask.save();
-                    });
-                    return res.json({
-                        code: 200,
-                        message: "Successfully added training tasks",
-                    });
-                });
-            }else{
-                User.findOne({email: req.body.assigneeEmail}, async (err, user) => {
-                    var taskData = {
-                        taskId: Math.abs(
-                            generateHash(
-                                req.body.taskName +
-                                    req.body.taskLink +
-                                    req.body.startDate +
-                                    req.body.dueDate
-                            )
-                        ),
-                        assignerEmail: req.body.assignerEmail,
-                        assigneeEmail: user.email,
-                        taskName: req.body.taskName,
-                        taskLink: req.body.taskLink,
-                        taskDescription: req.body.taskDescription,
-                        startDate: req.body.startDate,
-                        dueDate: req.body.dueDate,
-                        status: "Incomplete",
-                    };
-                    const trainingTask = await TrainingTask.create(taskData);
-                    await trainingTask.save();
-                    return res.json({
-                        code: 200,
-                        message: "Successfully added training tasks",
-                    });
-                });
-            }
-        });
-    } catch (error) {
-        return res.json(error);
-    }
-});
-
-router.post("/trainingTask/get", async (req, res, next) => {
-    const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-    const TrainingTask = mongoose.connection
-        .useDb(companyDB)
-        .model("assignTraining", trainingSchema);
-    userTrainingTasks = {};
-    await TrainingTask.find({ assigneeEmail: req.body.requestorEmail })
-        .then((tasks) => {
-            if (!tasks) {
-                return res.json({
-                    code: 404,
-                    message: "No assigned tasks found for the user",
-                });
-            }
-            userTrainingTasks["received"] = tasks;
-        })
-        .catch((err) =>
-            res.json({
-                code: 500,
-                message: err.message,
-            })
-        );
-    await TrainingTask.find({ assignerEmail: req.body.requestorEmail })
-        .then((tasks) => {
-            if (!tasks) {
-                return res.json({
-                    code: 404,
-                    message: "User has not created any training tasks",
-                });
-            }
-            userTrainingTasks["created"] = tasks;
-        })
-        .catch((err) =>
-            res.json({
-                code: 500,
-                message: err.message,
-            })
-        );
-    return res.json(userTrainingTasks);
-});
-
-router.patch("/trainingTask/edit", (req, res, next) => {
-    try {
-        const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-        const TrainingTask = mongoose.connection
-            .useDb(companyDB)
-            .model("assignTraining", trainingSchema);
-
-        TrainingTask.findOne(
+        PerformanceReview.findOne(
             {
                 taskId: req.body.taskId,
             },
@@ -276,9 +194,9 @@ router.patch("/trainingTask/edit", (req, res, next) => {
                         message: "No task with such credentials found",
                     });
                 }
-
-                if (req.body.requestorEmail === task.assignerEmail) {
-                    TrainingTask.updateMany(
+                const user = User.find({employeeId: task.assignerEmail})
+                if (req.body.requestorEmail === user.email) {
+                    PerformanceReview.updateMany(
                         {
                             taskId: req.body.taskId,
                             assignerEmail: req.body.requestorEmail,
@@ -293,7 +211,27 @@ router.patch("/trainingTask/edit", (req, res, next) => {
                         });
                     });
                 } else if (req.body.requestorEmail === task.assigneeEmail) {
-                    TrainingTask.updateOne(
+                    if (len(req.body.overallComments) == 0 & isAlpha(req.body.overallComments)) {
+                        return res.json({
+                            message: "Cannot provide unjustified rating score."
+                        });
+                    }
+                    if (len(req.body.growthFeedback) == 0) {
+                        return res.json({
+                            message: "Cannot provide unjustified rating score."
+                        });
+                    }
+                    if (len(req.body.kindnessFeedback) == 0) {
+                        return res.json({
+                            message: "Cannot provide unjustified rating score."
+                        });
+                    }
+                    if (len(req.body.deliveryFeedback) == 0) {
+                        return res.json({
+                            message: "Cannot provide unjustified rating score."
+                        });
+                    }
+                    PerformanceReview.updateOne(
                         {
                             taskId: req.body.taskId,
                             assigneeEmail: req.body.requestorEmail,
@@ -315,14 +253,14 @@ router.patch("/trainingTask/edit", (req, res, next) => {
     }
 });
 
-router.delete("/trainingTask/delete", (req, res, next) => {
+router.delete("/PerformanceReview/delete", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
-        const TrainingTask = mongoose.connection
+        const PerformanceReview = mongoose.connection
             .useDb(companyDB)
             .model("assignTraining", trainingSchema);
 
-        TrainingTask.findOne(
+        PerformanceReview.findOne(
             {
                 taskId: req.body.taskId,
                 assignerEmail: req.body.assignerEmail,
@@ -334,7 +272,7 @@ router.delete("/trainingTask/delete", (req, res, next) => {
                         message: "No task with such credentials found",
                     });
                 }
-                TrainingTask.deleteMany({
+                PerformanceReview.deleteMany({
                     taskId: req.body.taskId,
                     assignerEmail: req.body.assignerEmail,
                 })

@@ -52,7 +52,7 @@ function Searchbar(){
     const [query, setQuery] = useState("");
     function handleChange(e){
         setQuery(e.target.value);
-        dispatch(searchTask(query));
+        dispatch(searchTask(e.target.value));
     }
     
     return(

@@ -1,4 +1,4 @@
-function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:null, filter: "", category:"UNCOMPLETE"}, action){
+function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:null, query: "", category:"UNCOMPLETE"}, action){
     switch(action.type){
     case "UNCOMPLETE":
         return { ...state, category:"UNCOMPLETE"};
@@ -15,8 +15,8 @@ function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:nu
         return state;
     case "GETTASK":
         return {...state, taskList: action.payload.received, sentList: action.payload.sent};
-    case "SETFILTER":
-        return {...state, filter: action.payload};
+    case "SEARCHTASK":
+        return {...state, query: action.payload};
     default:
         return state;
     }

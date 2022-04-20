@@ -103,16 +103,20 @@ router.post('/performanceReview/create', (req, res, next) => {
             }
             var taskData = {
                 taskId: Math.abs(generateHash()),
+                reviewerEmail: req.body.reviewerEmail,
                 reviewerId: req.body.reviewerId,
+                reviewerManagerId: req.body.reviewerManagerId,
+                revieweeEmail: req.body.revieweeEmail,
                 revieweeId: req.body.revieweeId,
+                revieweeManagerId: req.body.revieweeManagerId,
                 companyId: req.body.companyId,
                 companyName: req.body.companyName,
                 overallComments: req.body.overallComments,
-                growthFeedback: req.body.growthFeedback,
+                growthFeedbackComments: req.body.growthFeedbackComments,
                 growthFeedbackScore: req.body.growthFeedbackScore,
-                kindnessFeedback: req.body.kindnessFeedback,
+                kindnessFeedbackComments: req.body.kindnessFeedbackComments,
                 kindnessFeedbackScore: req.body.kindnessFeedbackScore,
-                deliveryFeedback: req.body.deliveryFeedback,
+                deliveryFeedbackComments: req.body.deliveryFeedbackComments,
                 deliveryFeedbackScore: req.body.deliveryFeedbackScore,
                 dueDate: req.body.dueDate,
                 status: req.body.status

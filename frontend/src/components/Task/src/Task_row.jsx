@@ -34,6 +34,7 @@ const Task_row = () => {
     };
 
     const taskList=useSelector((state ) => state.task.taskList);
+    console.log(taskList)
     return(
         <>
             <List style={flexContainer}>
@@ -58,9 +59,9 @@ const Task_row = () => {
                     .map(task=>
 
                         {
-                        return(
-                            <Task key={task._id} task={task}/>
-                        )
+                            return(
+                                <Task key={task._id} task={task}/>
+                            )
                     }):( <></>
                        )
             }
@@ -69,6 +70,18 @@ const Task_row = () => {
                     .filter(task => task.status === "Completed")
                     .map(task=>
                         {
+                            return(
+                                <Task key={task._id} task={task}/>
+                            )
+                        }):( <></>
+                           )
+            }
+            { 
+                show==="Archived"?taskList
+                    .filter(task => task.status === "Archived")
+                    .map(task=>
+                        {
+                            console.log(task)
                             return(
                                 <Task key={task._id} task={task}/>
                             )

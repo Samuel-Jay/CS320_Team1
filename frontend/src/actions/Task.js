@@ -8,23 +8,13 @@ export const changeDisp =  (task)=> async (dispatch) => {
     }
 };
 
-export const incomplete =  ()=> async (dispatch) => {
+export const changeStatus =  (task)=> async (dispatch) => {
     try{
-        dispatch({type: "UNCOMPLETE"});
-    }catch(err){
-        console.log(err);
-    }
-};
-export const complete =  ()=> async (dispatch) => {
-    try{
-        dispatch({type: "COMPLETE"});
-    }catch(err){
-        console.log(err);
-    }
-};
-export const archive =  ()=> async (dispatch) => {
-    try{
-        dispatch({type: "ARCHIVE"});
+        const assigneeEmail = task.task.task.assigneeEmail
+        const taskId = task.task.task.taskId
+        const status = task.status
+        const data = {taskId, status}
+        dispatch({type: "CHANGESTATUS", payload: data});
     }catch(err){
         console.log(err);
     }

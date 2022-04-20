@@ -70,7 +70,7 @@ router.get("/profile", (req, res, next) => {
 
 router.post('/performanceReview/create', (req, res, next) => {
     try {
-        const companyDB = companies.get(req.body.reviewerEmail.split("@")[1]);
+        const companyDB = companies.get(req.body.email.split("@")[1]);
         const User = mongoose.connection
             .useDb(companyDB)
             .model("users", userSchema);
@@ -134,7 +134,7 @@ router.post('/performanceReview/create', (req, res, next) => {
 });
 
 router.post("/performanceReview/get", async (req, res, next) => {
-    const companyDB = companies.get(req.body.Email.split("@")[1]);
+    const companyDB = companies.get(req.body.email.split("@")[1]);
     const User = mongoose.connection
             .useDb(companyDB)
             .model("users", userSchema);
@@ -142,15 +142,15 @@ router.post("/performanceReview/get", async (req, res, next) => {
         .useDb(companyDB)
         .model("PerformanceReviews", PerformanceReviewSchema);
     userPerformanceReviews = {};
-    await PerformanceReview.find({ taskId: req.body.taskId })
-        .then((tasks) => {
-            if (!tasks) {
+    await PerformanceReview.find({ reviewerEmail: req.body.email })
+        .then((reviewTasks) => {
+            if (!reviewTasks) {
                 return res.json({
                     code: 404,
                     message: "No reviews found for the user to do.",
                 });
             }
-            userPerformanceReviews["received"] = tasks;
+            userPerformanceReviews["received"] = reviewTasks;
         })
         .catch((err) =>
             res.json({

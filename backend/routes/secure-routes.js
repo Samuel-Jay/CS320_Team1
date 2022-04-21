@@ -173,7 +173,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-        await PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: "completed" })
+    await PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: "completed" })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({
@@ -204,7 +204,7 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
 
         PerformanceReview.findOne(
             {
-                reviewerId: req.body.reviewerId,
+                reviewerId: User.find({employeeId: req.body.reviewerId}),
             },
             (err, reviewTask) => {
                 if (!reviewTask) {

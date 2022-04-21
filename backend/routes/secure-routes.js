@@ -230,6 +230,16 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                         });
                     });
                 } else if (req.body.requestorEmail === task.assigneeEmail) {
+                    if (new Date() >= req.body.dueDate) {
+                        return res.json({
+                            message: "Cannot make changes past due date."
+                        });
+                    }
+                    if (req.body.status == 'approved') {
+                        return res.json({
+                            message: "Cannot make changes after approval."
+                        });
+                    }
                     if (len(req.body.overallComments) == 0 & isAlpha(req.body.overallComments)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score."
@@ -253,7 +263,25 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                     PerformanceReview.updateOne(
                         {
                             taskId: req.body.taskId,
-                            assigneeEmail: req.body.requestorEmail,
+                            // assigneeEmail: req.body.requestorEmail,
+                            // taskId: Math.abs(generateHash()),
+                            reviewerEmail: req.body.reviewerEmail,
+                            reviewerId: req.body.reviewerId,
+                            reviewerManagerId: User.find({employeeId: reviewerId}).managerId,
+                            revieweeEmail: user.email,
+                            revieweeId: user.employeeId,
+                            revieweeManagerId: user.managerId,
+                            companyId: user.companyId,
+                            companyName: user.companyName,
+                            overallComments: req.body.overallComments,
+                            growthFeedbackComments: req.body.growthFeedbackComments,
+                            growthFeedbackScore: req.body.growthFeedbackScore,
+                            kindnessFeedbackComments: req.body.kindnessFeedbackComments,
+                            kindnessFeedbackScore: req.body.kindnessFeedbackScore,
+                            deliveryFeedbackComments: req.body.deliveryFeedbackComments,
+                            deliveryFeedbackScore: req.body.deliveryFeedbackScore,
+                            dueDate: req.body.dueDate,
+                            status: req.body.status
                         },
                         {
                             ...req.body,

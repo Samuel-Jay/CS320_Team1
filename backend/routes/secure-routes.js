@@ -80,14 +80,13 @@ router.post('/performanceReview/create', (req, res, next) => {
 
         await User.findOne({ email: req.body.email }, async (err, user) => {
             let allowed = User.find({managerId: user.managerId});
-            if (!allowed.includes(req.body.reviewerId) &&
-            !allowed.includes(req.body.revieweeId)) {
+            if (!allowed.includes(req.body.reviewerId)) {
                 return res.json({
                     message: "Cannot request review from an employee who isn't your peer."
                 });
             }
-            else if (!User.find({managerId: user.employeeId}.includes(req.body.reviewerId)) ||
-            (req.body.revieweeId != user.managerId)) {
+            else if (!User.find({managerId: user.employeeId}.includes(
+                req.body.revieweeId) && req.body.revieweeId == user.employeeId)) {
                 return res.json({
                     message: "Cannot request review from employee who isn't peer or subordinate."
                 });
@@ -105,12 +104,12 @@ router.post('/performanceReview/create', (req, res, next) => {
                 taskId: Math.abs(generateHash()),
                 reviewerEmail: req.body.reviewerEmail,
                 reviewerId: req.body.reviewerId,
-                reviewerManagerId: req.body.reviewerManagerId,
-                revieweeEmail: req.body.revieweeEmail,
-                revieweeId: req.body.revieweeId,
-                revieweeManagerId: req.body.revieweeManagerId,
-                companyId: req.body.companyId,
-                companyName: req.body.companyName,
+                reviewerManagerId: User.find({employeeId: reviewerId}).managerId,
+                revieweeEmail: user.email,
+                revieweeId: user.employeeId,
+                revieweeManagerId: user.managerId,
+                companyId: user.companyId,
+                companyName: user.companyName,
                 overallComments: req.body.overallComments,
                 growthFeedbackComments: req.body.growthFeedbackComments,
                 growthFeedbackScore: req.body.growthFeedbackScore,
@@ -142,7 +141,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
         .useDb(companyDB)
         .model("PerformanceReviews", PerformanceReviewSchema);
     userPerformanceReviews = {};
-    await PerformanceReview.find({ reviewerEmail: req.body.email })
+    await PerformanceReview.find({ reviewerEmail: req.body.email, status: {$in: ["in progress", "to be done"]} })
         .then((reviewTasks) => {
             if (!reviewTasks) {
                 return res.json({
@@ -158,7 +157,23 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    await PerformanceReview.find({ taskId: req.body.taskId })
+    await PerformanceReview.find({ revieweeEmail:req.body.email, status: "to be done" })
+        .then((tasks) => {
+            if (!tasks) {
+                return res.json({
+                    code: 404,
+                    message: "User has not created any performance reviews",
+                });
+            }
+            userPerformanceReviews["created"] = tasks;
+        })
+        .catch((err) =>
+            res.json({
+                code: 500,
+                message: err.message,
+            })
+        );
+        await PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: "completed" })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({
@@ -185,17 +200,17 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
             .model("users", userSchema);
         const PerformanceReview = mongoose.connection
             .useDb(companyDB)
-            .model("performanceReview", pfrvSchema);
+            .model("PerformanceReviews", PerformanceReviewSchema);
 
         PerformanceReview.findOne(
             {
-                taskId: req.body.taskId,
+                reviewerId: req.body.reviewerId,
             },
-            (err, task) => {
-                if (!task) {
+            (err, reviewTask) => {
+                if (!reviewTask) {
                     return res.json({
                         code: 404,
-                        message: "No task with such credentials found",
+                        message: "No reviews found.",
                     });
                 }
                 const user = User.find({employeeId: task.assignerEmail})
@@ -291,82 +306,6 @@ router.delete("/PerformanceReview/delete", (req, res, next) => {
                     });
             }
         );
-    } catch (error) {
-        return res.json(error);
-    }
-});
-
-
-
-router.patch("pto/edit", (req, res, next) => {
-    try {
-        const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-        const PTOTask = mongoose.connection
-            .useDb(companyDB)
-            .model("PTORequests", ptoSchema);
-        PTOTask.findOne(
-            {
-                taskId: req.body.taskId,
-                requestorEmail: req.body.requestorEmail,
-            },
-            (err, task) => {
-                if (!task) {
-                    return res.json({
-                        code: 404,
-                        message: "No task with such credentials found",
-                    });
-                }
-                PTOTask.updateOne(
-                    {
-                        taskId: req.body.taskId,
-                        requestorEmail: req.body.requestorEmail,
-                    },
-                    {
-                        ...req.body,
-                    }
-                ).then(() => {
-                    return res.json({
-                        code: 200,
-                        message: "Paid Time Off Request updated successfully",
-                    });
-                });
-            }
-        );
-    } catch (error) {
-        return res.json(error);
-    }
-});
-router.delete("pto/delete", (req, res, next) => {
-    try {
-        const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
-        const PTOTask = mongoose.connection
-            .useDb(companyDB)
-            .model("PTORequests", ptoSchema);
-
-        PTOTask.findOne({ taskId: req.body.taskId }, (err, task) => {
-            if (!task) {
-                return res.json({ code: 404, message: "Request not found" });
-            }
-            if (task.requestorEmail !== req.body.requestorEmail) {
-                return res.json({
-                    code: 401,
-                    message: "User does not have deleting permissions",
-                });
-            }
-            PTOTask.delete({
-                taskId: req.body.taskId,
-                requestorEmail: req.body.requestorEmail,
-            })
-                .then(() => {
-                    return res.json({
-                        code: 200,
-                        message: "Paid Time Off Request deleted successfully",
-                    });
-                })
-                .catch((err) => {
-                    return res.json(err);
-                });
-        });
     } catch (error) {
         return res.json(error);
     }

@@ -173,7 +173,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    await PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: "completed" })
+    await PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: {$in: ["completed", "approved"]} })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({
@@ -213,31 +213,50 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                         message: "No reviews found.",
                     });
                 }
-                const user = User.find({employeeId: task.assignerEmail})
-                if (req.body.requestorEmail === user.email) {
-                    PerformanceReview.updateMany(
-                        {
-                            taskId: req.body.taskId,
-                            assignerEmail: req.body.requestorEmail,
-                        },
-                        {
-                            ...req.body,
-                        }
-                    ).then(() => {
-                        return res.json({
-                            code: 200,
-                            message: "Training Tasks updated successfully",
-                        });
-                    });
-                } else if (req.body.requestorEmail === task.assigneeEmail) {
+                const user = User.find({employeeId: reviewTask.reviewerId,
+                email: reviewerEmail})
+                if (req.body.email === user.email) {
                     if (new Date() >= req.body.dueDate) {
+                        PerformanceReview.updateOne(
+                            {
+                                taskId: req.body.taskId,
+                                // assigneeEmail: req.body.requestorEmail,
+                                // taskId: Math.abs(generateHash()),
+                                reviewerEmail: req.body.reviewerEmail,
+                                reviewerId: req.body.reviewerId,
+                                reviewerManagerId: User.find({employeeId: reviewerId}).managerId,
+                                revieweeEmail: user.email,
+                                revieweeId: user.employeeId,
+                                revieweeManagerId: user.managerId,
+                                companyId: user.companyId,
+                                companyName: user.companyName,
+                                overallComments: "",
+                                growthFeedbackComments: "",
+                                growthFeedbackScore: undefined,
+                                kindnessFeedbackComments: "",
+                                kindnessFeedbackScore: undefined,
+                                deliveryFeedbackComments: "",
+                                deliveryFeedbackScore: undefined,
+                                dueDate: req.body.dueDate,
+                                status: "complete"
+                            },
+                            {
+                                ...req.body,
+                            }
+                        ).then(() => {
+                            return res.json({
+                                code: 200,
+                                message: "Incomplete Performance Review submitted",
+                            });
+                        });
                         return res.json({
                             message: "Cannot make changes past due date."
                         });
                     }
-                    if (req.body.status == 'approved') {
+                    if (req.body.status == 'approved' ||
+                    req.body.status == 'complete') {
                         return res.json({
-                            message: "Cannot make changes after approval."
+                            message: "Cannot make changes after completion or approval."
                         });
                     }
                     if (len(req.body.overallComments) == 0 & isAlpha(req.body.overallComments)) {
@@ -289,8 +308,14 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                     ).then(() => {
                         return res.json({
                             code: 200,
-                            message: "Training Task updated successfully",
+                            message: "Performance Review updated successfully",
                         });
+                    });
+                } else if (req.body.email === reviewTask.revieweeEmail ||
+                    User.find({employeeId: reviewTask.revieweeId,
+                    email: reviewTask.revieweeEmail})) {
+                    return res.json({
+                        message: "Does not have edit permissions on this review.",
                     });
                 }
             }

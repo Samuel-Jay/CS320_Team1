@@ -67,7 +67,7 @@ router.patch("/pto/edit", async (req, res, next) => {
       reason: req.body.reason ? req.body.reason : ptoRequest["reason"],
       dueDate: req.body.dueDate ? req.body.dueDate : ptoRequest["dueDate"],
     };
-  } else if (user.employeeId == ptoRequest.managerId) {
+  } else if (user.employeeId == ptoRequest.managerId && user.isManager) {
     ptoData = {
       status: req.body.status ? req.body.status : ptoRequest["status"],
     };
@@ -139,7 +139,7 @@ router.get("/pto/get", async (req, res, next) => {
 
 router.post("/pto/create", (req, res, next) => {
   try {
-    const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
+    const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
     const User = mongoose.connection
       .useDb(companyDB)
       .model("users", userSchema);
@@ -147,36 +147,50 @@ router.post("/pto/create", (req, res, next) => {
       .useDb(companyDB)
       .model("PTORequests", ptoSchema);
 
-    User.findOne({ employeeId: req.body.employeeId }, async (err, user) => {
-      if (user.positionTitle == "CEO") {
+    User.findOne({ email: req.body.requestorEmail }, async (err, employee) => {
+      if (!employee) {
+        return res.json({
+          code: 404,
+          status: "error",
+          message: "employee does not exist",
+        });
+      }
+      if (employee.positionTitle == "CEO") {
         return res.json({
           message: "This user is not authorized to make PTO requests.",
         });
       }
-      var taskData = {
-        taskId: generateHash(),
-        // managerEmail: req.body.managerEmail,
-        managerId: req.body.managerId,
-        employeeId: req.body.employeeId,
-        title: req.body.title,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        reason: req.body.reason,
-        // assignerEmail: req.body.assignerEmail,
-        // assigneeEmail: req.body.assigneeEmail,
-        // requestorEmail: req.body.requestorEmail,
-        dueDate: req.body.dueDate,
-        status: "Pending",
-      };
-      const ptoReq = await PTORequest.create(taskData);
-      await ptoReq.save();
-      return res.json({
-        code: 200,
-        message: "Successfully added PTO request.",
-      });
+      User.findOne(
+        { email: req.body.managerEmail, isManager: true },
+        async (err, manager) => {
+          if (!manager || employee.managerId != manager.employeeId) {
+            return res.json({
+              message: "Invalid Manager credentials",
+            });
+          }
+
+          var taskData = {
+            taskId: generateHash(),
+            managerId: manager.employeeId,
+            employeeId: employee.employeeId,
+            title: req.body.title,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate,
+            reason: req.body.reason,
+            dueDate: req.body.dueDate,
+            status: "Pending",
+          };
+          const ptoReq = await PTORequest.create(taskData);
+          await ptoReq.save();
+          return res.json({
+            code: 200,
+            message: "Successfully added PTO request.",
+          });
+        }
+      );
     });
-  } catch (error) {
-    return res.json(error);
+  } catch (err) {
+    return res.send(err);
   }
 });
 

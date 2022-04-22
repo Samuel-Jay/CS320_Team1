@@ -67,7 +67,7 @@ router.patch("/pto/edit", async (req, res, next) => {
       reason: req.body.reason ? req.body.reason : ptoRequest["reason"],
       dueDate: req.body.dueDate ? req.body.dueDate : ptoRequest["dueDate"],
     };
-  } else if (user.employeeId == ptoRequest.managerId && user.isManager) {
+  } else if (user.employeeId == ptoRequest.managerId) {
     ptoData = {
       status: req.body.status ? req.body.status : ptoRequest["status"],
     };
@@ -168,7 +168,6 @@ router.post("/pto/create", (req, res, next) => {
               message: "Invalid Manager credentials",
             });
           }
-
           var taskData = {
             taskId: generateHash(),
             managerId: manager.employeeId,

@@ -78,7 +78,7 @@ router.post('/performanceReview/create', (req, res, next) => {
             .useDb(companyDB)
             .model("PerformanceReviews", PerformanceReviewSchema);
 
-        await User.findOne({ email: req.body.email }, async (err, user) => {
+        User.findOne({ email: req.body.email }, async (err, user) => {
             let allowed = User.find({managerId: user.managerId});
             if (!allowed.includes(req.body.reviewerId)) {
                 return res.json({
@@ -141,7 +141,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
         .useDb(companyDB)
         .model("PerformanceReviews", PerformanceReviewSchema);
     userPerformanceReviews = {};
-    await PerformanceReview.find({ reviewerEmail: req.body.email, status: {$in: ["in progress", "to be done"]} })
+    PerformanceReview.find({ reviewerEmail: req.body.email, status: {$in: ["in progress", "to be done"]} })
         .then((reviewTasks) => {
             if (!reviewTasks) {
                 return res.json({
@@ -157,7 +157,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    await PerformanceReview.find({ revieweeEmail:req.body.email, status: "to be done" })
+    PerformanceReview.find({ revieweeEmail:req.body.email, status: "to be done" })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({
@@ -173,7 +173,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    await PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: {$in: ["completed", "approved"]} })
+    PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: {$in: ["completed", "approved"]} })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({

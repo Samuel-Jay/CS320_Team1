@@ -12,21 +12,15 @@ import React, {useState, useEffect} from 'react';
 import Task from './Task.jsx'
 import {useDispatch} from 'react-redux';
 import {changeDisp, incomplete, complete, archive, getTrainingTask} from '../../../actions/Task.js';
-function handleShowUserMenu(e){
-    setShowUserMenu(e.currentTarget);
-}
-function handleCloseUserMenu(){
-    setShowUserMenu(null);
-}
+
 
 export default function MoveButton() {
+
     return(
         <div>
-        
-        <Button   variant="contained" sx={{backgroundColor: '#005151', '&:hover':{bgcolor:"#20B3A7"}, m:2}} onClick={handleShowUserMenu}>
-        Move
-        </Button>
-       
+            <Button   variant="contained" sx={{backgroundColor: '#005151', '&:hover':{bgcolor:"#20B3A7"}, m:2}} >
+                Move
+            </Button>
         </div>
 
 

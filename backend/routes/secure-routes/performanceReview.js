@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const PerformanceReviewSchema = require("../schema/PerformanceReviewSchema");
-const userSchema = require("../schema/UserSchema");
-const { companies } = require("../config");
+const PerformanceReviewSchema = require("../../schema/PerformanceReviewSchema.js");
+const userSchema = require("../../schema/UserSchema");
+const { companies } = require("../../config");
 const { isUndefined } = require("util");
 
 // const generateHash = (key) => {

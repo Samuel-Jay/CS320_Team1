@@ -11,7 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import React, {useState, useEffect} from 'react';
 import Task from './Task.jsx'
 import {useDispatch} from 'react-redux';
-import {changeDisp, incomplete, complete, archive, getTrainingTask} from '../../../actions/Task.js';
+import {openTask, getTrainingTask} from '../../../actions/Task.js';
 
 const Task_row = () => {
     const dispatch = useDispatch();
@@ -23,15 +23,15 @@ const Task_row = () => {
     function handleClick(value){
         setShow(value);
     }
+    function handleWindow(task){
+        dispatch(openTask(task))
+    }
     const flexContainer ={
         display:'flex',
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
         padding: 0,
     };
-    function handleWindow(task){
-        return( <Window task={task}/>);
-    }
     const taskList=useSelector((state ) => state.task.taskList);
     const query = useSelector((state) => state.task.query);
     return(

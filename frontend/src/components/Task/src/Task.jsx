@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useDispatch} from "react-redux";
-import {openTask} from "../../../actions/Task.js";
+import {openTask, closeTask} from "../../../actions/Task.js";
 import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
 import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
 import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";

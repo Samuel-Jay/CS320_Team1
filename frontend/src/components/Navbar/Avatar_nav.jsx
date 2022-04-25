@@ -4,7 +4,7 @@ import {Link } from 'react-router-dom'
 import {useNavigate, useLocation} from 'react-router'
 import {useDispatch} from 'react-redux'
 
-function avatar(){
+function Avatar_nav(){
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')));
@@ -75,4 +75,4 @@ function avatar(){
     )
 }
 
-export default avatar 
+export default Avatar 

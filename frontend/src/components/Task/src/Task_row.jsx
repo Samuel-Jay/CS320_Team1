@@ -27,7 +27,7 @@ const Task_row = () => {
         display:'flex',
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
-        padding: 10,
+        padding: 0,
     };
     function handleWindow(task){
         return( <Window task={task}/>);
@@ -37,7 +37,6 @@ const Task_row = () => {
     return(
         <div>
 
-  
         
             <List style={flexContainer}>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: "#005151", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
@@ -45,6 +44,7 @@ const Task_row = () => {
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
             </List>
+    
             { 
                 show==="All"?taskList.filter(task => {
                     return query === ""
@@ -56,7 +56,7 @@ const Task_row = () => {
                     }).map(task=>
                         {
                             return(
-                                <>
+                                <>  
                                     <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                                 </>
                             )
@@ -70,7 +70,7 @@ const Task_row = () => {
                                     </>
                                 )
                             }
-                           ))
+                    ))
                         }
                             
                             </div>

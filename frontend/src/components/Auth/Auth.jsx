@@ -6,8 +6,7 @@ import {useDispatch} from "react-redux";
 import {signin} from "../../actions/User.js";
 import {useNavigate} from "react-router-dom";
 import {getEmployees} from "../../actions/Task.js";
-
-
+import background from '../../styles/img/background.png';
   
 function Auth(){
     const dispatch = useDispatch();
@@ -28,7 +27,7 @@ function Auth(){
                 ()=>{
                     if(localStorage.getItem("profile")){
                         dispatch(getEmployees());
-                        navigate("/");
+                        navigate("/TaskBox");
                     }else{
                         setHasFailed(true);
                     }
@@ -49,6 +48,7 @@ function Auth(){
     }
     return(
         <form onSubmit={handleSubmit}>
+            <div style = {{width: '100%', height: '100%', backgroundImage: `url(${background})`}}>
             <Grid container spacing={0} alignItems="center" justifyContent="center" style={{minHeight: "100vh" }}>
                 <Paper elevation={3} >
                     <Box p={3}>
@@ -89,6 +89,7 @@ function Auth(){
                     </Box>
                 </Paper>
             </Grid>
+            </div>
         </form>
     );
 }

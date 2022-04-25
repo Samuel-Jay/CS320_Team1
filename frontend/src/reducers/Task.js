@@ -21,6 +21,7 @@ const usersDefaultState = [];
     default:
         return state;
     }
+
 }
 
 export default taskReducer;

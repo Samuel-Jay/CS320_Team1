@@ -21,7 +21,7 @@ mongoose.Promise = global.Promise;
 require("./auth/auth");
 
 const routes = require("./routes/routes");
-const secureRoute = require("./routes/secure-routes");
+const secureRoute = require("./routes/secure-routes/index");
 const app = express();
 app.use(cors());
 app.use(express.json());

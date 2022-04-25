@@ -47,7 +47,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 }));
 
 
-function Searchbar(){
+export default function Searchbar(){
     const dispatch = useDispatch();
     const [query, setQuery] = useState("");
     function handleChange(e){
@@ -70,5 +70,3 @@ function Searchbar(){
     )
     
 }
-
-export default Searchbar

@@ -2,13 +2,32 @@ const mongoose = require("mongoose");
 
 const PerformanceReview = new mongoose.Schema(
     {
+        taskId: {
+            type: Number,
+            required: true,
+        },
         reviewerEmail: {
             type: String,
             required: true,
         },
-        revieweeEmail: {
-            type: String,
+        reviewerId: {
+            type: Number,
             required: true,
+        },
+        reviewerManagerId: {
+            type: Number,
+            required: false,
+        },
+        revieweeEmail : {
+            type: String,
+        },
+        revieweeId: {
+            type: Number,
+            required: true,
+        },
+        revieweeManagerId: {
+            type: Number,
+            required: false
         },
         companyId: {
             type: Number,
@@ -22,7 +41,7 @@ const PerformanceReview = new mongoose.Schema(
             type: String,
             required: true,
         },
-        growthFeedback: {
+        growthFeedbackComments: {
             type: String,
             required: true,
         },
@@ -30,7 +49,7 @@ const PerformanceReview = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        kindnessFeedback: {
+        kindnessFeedbackComments: {
             type: String,
             required: true,
         },
@@ -38,12 +57,16 @@ const PerformanceReview = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        deliveryFeedback: {
+        deliveryFeedbackComments: {
             type: String,
             required: true,
         },
         deliveryFeedbackScore: {
             type: Number,
+            required: true,
+        },
+        startDate: {
+            type: Date,
             required: true,
         },
         dueDate: {
@@ -57,6 +80,7 @@ const PerformanceReview = new mongoose.Schema(
     },
     {
         timestamps: true,
+        collection: "performanceReview"
     }
 );
 

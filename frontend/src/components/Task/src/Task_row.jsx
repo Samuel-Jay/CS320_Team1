@@ -37,7 +37,6 @@ const Task_row = () => {
     return(
         <div>
 
-        
             <List style={flexContainer}>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: "#005151", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>

@@ -28,7 +28,7 @@ function Home(){
 			<Paper elevation={3} >
 				<Box p={3}>
 					{user === null?(
-						<Button component={Link} to={"/login"} variant="contained" color="primary">Sign In</Button>
+						<Button component={Link} to={"/login"} variant="contained" sx={{'&:hover':{bgcolor:"#20B3A7"}}} color="primary">Sign In</Button>
 					):(
 						<>
 							<Typography>

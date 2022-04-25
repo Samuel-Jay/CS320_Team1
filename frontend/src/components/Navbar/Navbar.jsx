@@ -27,7 +27,7 @@ function Navbar(){
                 </Box>
 	        {
 		    user===null ? (
-			<Button component={Link} to={"/login"} variant="contained" style={{ background: '#005151' }}>Sign In</Button>
+			<Button component={Link} to={"/login"} variant="contained" style={{ background: '#005151' }} sx={{'&:hover':{bgcolor:"#20B3A7"}}}>Sign In</Button>
 		    ) : (
                         <>
                             <TaskForm/>

@@ -38,9 +38,9 @@ const Task_row = () => {
         <>
             <List style={flexContainer}>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="All"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
             </List>
             { 
                 show==="All"?taskList.filter(task => {
@@ -57,11 +57,21 @@ const Task_row = () => {
                                     <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                                 </>
                             )
-                        }):( <>
-                             </>
-                           )
-                }
-            </>
+                        }):(taskList.filter(task=>{
+                            return show===task.status.toLowerCase()
+                        }).map(task=>
+                            {
+                                return(
+                                    <>
+                                        <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
+                                    </>
+                                )
+                            }
+                           ))
+                        }
+                            
+        </>
+                        
         ) 
 }
 export default Task_row;

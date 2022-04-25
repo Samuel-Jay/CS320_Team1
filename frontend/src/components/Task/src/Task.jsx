@@ -26,6 +26,9 @@ function Task(task){
     function handleWindow(task){
         dispatch(openTask(task.task));
     }
+    function closeWindow(){
+        dispatch(closeTask());
+    }
     return (
         <div className="EmailRow" style={{ backgroundColor: '#FFFFFF' }} onClick={()=>{handleWindow(task)}}>
             <Checkbox  size="small" onChange={change_status(task)} style ={{color: "#199086",}}  />

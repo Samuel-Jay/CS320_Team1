@@ -1,4 +1,5 @@
-function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:null, query: "", category:"UNCOMPLETE"}, action){
+const usersDefaultState = [];
+  function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:null, query: "", category:"UNCOMPLETE"}, action){
     switch(action.type){
     case "UNCOMPLETE":
         return { ...state, category:"UNCOMPLETE"};
@@ -9,7 +10,7 @@ function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:nu
     case "OPENTASK":
         return { ...state,  openTask: action.payload};
     case "CLOSETASK":
-        return { ...state,  openTask: null};
+        return {usersDefaultState};
     case "GETEMPLOYEE":
         localStorage.setItem("employees", JSON.stringify(action.payload.employees));
         return state;

@@ -65,7 +65,7 @@ function Auth(){
                             </>
                         )}
                         <Grid>
-                            <Input name="email" label="email" sx={{'& .MuiOutlinedInput-root': {'& fieldset': {borderColor: '#008080',}}}} handleChange={handleChange}/>
+                            <Input name="email" label="email" handleChange={handleChange}/>
                             <Input name="password" label="password" type={showPassword?"text":"password"} handleChange={handleChange} handleShowPassword={toggleShowPassword}/>
                         </Grid>
                         {isSignup && (

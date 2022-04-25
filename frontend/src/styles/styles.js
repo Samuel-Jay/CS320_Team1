@@ -1,6 +1,6 @@
 const styles = {
     authenticationGrid:{
-        backgroundImage: "./img/background.png"
+        backgroundImage: "./img/background.jpg"
     }
 };
 export default styles;

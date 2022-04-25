@@ -26,31 +26,7 @@ export default function MoveButton() {
         <Button   variant="contained" sx={{backgroundColor: '#005151', '&:hover':{bgcolor:"#20B3A7"}, m:2}} onClick={handleShowUserMenu}>
         Move
         </Button>
-        <Menu sx={{ mt: '45px' }}
-	          id="menu-appbar"
-	          anchorEl={showUserMenu}
-	          anchorOrigin={{
-		      vertical: 'top',
-		      horizontal: 'right',
-	          }}
-	          keepMounted
-	          transformOrigin={{
-		      vertical: 'top',
-		      horizontal: 'right',
-	          }}
-	          open={Boolean(showUserMenu)}
-	          onClose={handleCloseUserMenu}
-	    >
-	        <MenuItem key="Incomplete" component={Incomplete} to={"/"}>
-		    <Typography textAlign="center">Incomplete</Typography>
-	        </MenuItem>
-	        <MenuItem key="Complete" onClick={Complete}>
-		    <Typography textAlign="center">Complete</Typography>
-	        </MenuItem>
-            <MenuItem key="Archived" onClick={Archived}>
-		    <Typography textAlign="center">Complete</Typography>
-	        </MenuItem>
-	    </Menu>
+       
         </div>
 
 

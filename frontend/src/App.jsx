@@ -22,18 +22,16 @@ const themeLight = createTheme({
 function App() {
     return (
 	<BrowserRouter>
-	    <div style = {{width: '100%', height: '100%', backgroundImage: `url(${background})`}}>
-                <Navbar/>
 		<Routes>
-		    <Route path="/" element = {
-                               <>
-                                   <Task_row/>
-                                   <Window/>
-                               /</>
-                           }/>
-		    <Route path="/login" element={<Auth/>} />
+		    <Route path="/" element={<Auth/>} />
+            <Route path="/TaskBox" element = {
+                            <div className='main-body'>
+                            <Navbar/>
+                                <Task_row/>
+                                <Window/>
+                            </div>
+                        }/>
 		    </Routes>
-	    </ div>
 
 	</BrowserRouter>
     );

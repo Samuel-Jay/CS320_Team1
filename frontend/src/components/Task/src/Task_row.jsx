@@ -27,7 +27,7 @@ const Task_row = () => {
         display:'flex',
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
-        padding: 10,
+        padding: 0,
     };
     function handleWindow(task){
         return( <Window task={task}/>);
@@ -42,6 +42,7 @@ const Task_row = () => {
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086"}} onClick={ () => {handleClick("Completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086"}} onClick={ () => {handleClick("Archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
             </List>
+           
             { 
                 show==="All"?taskList.filter(task => {
                     return query === ""
@@ -53,14 +54,15 @@ const Task_row = () => {
                     }).map(task=>
                         {
                             return(
-                                <>
+                                <>  
                                     <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                                 </>
                             )
                         }):( <>
-                             </>
-                           )
+                        </>
+                )
                 }
+             
             </>
         ) 
 }

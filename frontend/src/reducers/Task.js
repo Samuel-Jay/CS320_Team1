@@ -20,6 +20,7 @@ function taskReducer(state = {taskList:[], sentList: [],employees:[],openTask:nu
     default:
         return state;
     }
+
 }
 
 export default taskReducer;

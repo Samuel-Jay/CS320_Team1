@@ -3,7 +3,7 @@ import {useNavigate, useLocation} from 'react-router'
 import {useDispatch} from 'react-redux'
 import { Menu, MenuItem, Typography, Toolbar, AppBar, Box, Button, IconButton } from '@mui/material'
 import {Link } from 'react-router-dom'
-import  Avatar from './Avatar.jsx'
+import  Avatar from './Avatar_nav.jsx'
 import TaskForm from '../TaskForm/TaskForm.jsx'
 import iconButton from '@mui/material/IconButton';
 import logo from '../../styles/img/logo.png';

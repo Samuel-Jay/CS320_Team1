@@ -67,7 +67,8 @@ export const openTask = (task) => async(dispatch) => {
 
 export const closeTask = () => async(dispatch) => {
     try{
-        dispatch({type: "CLOSETASK"})
+        dispatch({type: "CLOSETASK", })
+        console.log("yooooooooooo");
     }catch(err){
         console.log(err);
     }

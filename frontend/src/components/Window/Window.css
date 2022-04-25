@@ -18,7 +18,7 @@
   display: flex;
   color: #ffffff;
   flex-direction: row;
-  gap: 18%;
+
   background: #005151;
 }
 .Display_box .Header {

@@ -45,10 +45,10 @@ export default function FormDialog() {
                 Create Task
         </Button>
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>
-                    <span style={{color: '#005151'}}>Create Task</span>
+                <DialogTitle sx={{bgcolor: '#199086',}}>
+                    Create Task
                     </DialogTitle>
-                <DialogContent>
+                <DialogContent >
 
                     <FormControl sx={{ m: 1, width: 300 }}>
                         <Select labelId="task type" id="task type" value={taskType} label="task type" onChange={handleChange} MenuProps={MenuProps}>
@@ -82,7 +82,7 @@ export default function FormDialog() {
                     }
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleClose} sx={{color:"#005151"}}>Cancel</Button>
                 </DialogActions>
             </Dialog>
         </div>

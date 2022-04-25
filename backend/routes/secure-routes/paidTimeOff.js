@@ -117,7 +117,9 @@ router.get("/pto/get", async (req, res, next) => {
   userPTORequests["created"] = await PTORequestModel.find({
     employeeId: user.employeeId,
   })
-    .then()
+    .then((tasks) => {
+      tasks = tasks.map((task) => task.add(getUsetEmail(task.employeeId)));
+    })
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });
     });

@@ -35,9 +35,12 @@ const Task_row = () => {
     const taskList=useSelector((state ) => state.task.taskList);
     const query = useSelector((state) => state.task.query);
     return(
-        <>
+        <div>
+
+  
+        
             <List style={flexContainer}>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="All"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: "#005151", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
                 <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
@@ -70,7 +73,7 @@ const Task_row = () => {
                            ))
                         }
                             
-        </>
+                            </div>
                         
         ) 
 }

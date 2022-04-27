@@ -69,6 +69,7 @@ router.get("/profile", (req, res, next) => {
 // });
 
 router.post('/performanceReview/create', (req, res, next) => {
+    console.log("test")
     try {
         const companyDB = companies.get(req.body.email.split("@")[1]);
         const User = mongoose.connection
@@ -80,12 +81,13 @@ router.post('/performanceReview/create', (req, res, next) => {
 
         User.findOne({ email: req.body.email }, async (err, user) => {
             let allowed = User.find({managerId: user.managerId});
-            if (!allowed.includes(req.body.reviewerId)) {
-                return res.json({
-                    message: "Cannot request review from an employee who isn't your peer."
-                });
-            }
-            else if (!User.find({managerId: user.employeeId}.includes(
+            console.log(allowed);
+            //if (!allowed.includes(req.body.reviewerId)) {
+                // return res.json({
+                //     message: "Cannot request review from an employee who isn't your peer."
+                // });
+            //}
+            if (!User.find({managerId: user.employeeId}.includes(
                 req.body.revieweeId) && req.body.revieweeId == user.employeeId)) {
                 return res.json({
                     message: "Cannot request review from employee who isn't peer or subordinate."

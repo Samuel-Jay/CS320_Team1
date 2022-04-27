@@ -28,7 +28,6 @@ function App() {
                            <div className='main-body'>
                                <Navbar/>
                                <Task_row/>
-                               <Window/>
                            </div>
                        }/>
 	    </Routes>

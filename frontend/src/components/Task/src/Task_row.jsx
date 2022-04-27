@@ -46,8 +46,8 @@ const Task_row = () => {
             { 
                 show==="All"?taskList.filter(task => {
                     return query === ""
-                        || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
-                        || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
+                        // || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
+                        // || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
                         || task.taskDescription.toLowerCase().includes(query.toLowerCase())
                         || task.taskLink.toLowerCase().includes(query.toLowerCase())
                         || task.taskName.toLowerCase().includes(query.toLowerCase())
@@ -59,6 +59,10 @@ const Task_row = () => {
                         )
                     }):(taskList.filter(task=>{
                         return show.toLowerCase()===task.status.toLowerCase()
+                            && (query === ""
+                                || task.taskDescription.toLowerCase().includes(query.toLowerCase())
+                                || task.taskLink.toLowerCase().includes(query.toLowerCase())
+                                || task.taskName.toLowerCase().includes(query.toLowerCase()))
                     }).map(task=>
                         {
                             return(

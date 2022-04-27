@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const ptoSchema = require("../../schema/PTOSchema");
 const userSchema = require("../../schema/UserSchema");
 const { companies } = require("../../config");
-const generateHash = require("../../utils/hashIdGenerator");
+const generateHash = require("../../utils").hashIdGenerator;
 
 router.use(express.json());
 router.use(bodyParser.json());
@@ -97,6 +97,7 @@ router.get("/pto/get", async (req, res, next) => {
   const PTORequestModel = mongoose.connection
     .useDb(companyDB)
     .model("PTORequests", ptoSchema);
+  const getUserDetails = require("../../utils/").getUserDetails;
 
   let user = await UserModel.findOne({ email: req.body.userEmail })
     .then((user) => {
@@ -112,12 +113,27 @@ router.get("/pto/get", async (req, res, next) => {
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });
     });
-  userPTORequests = {};
 
+  userPTORequests = {};
   userPTORequests["created"] = await PTORequestModel.find({
     employeeId: user.employeeId,
   })
-    .then()
+    .then(async (tasks) => {
+      for (let [idx, task] of tasks.entries()) {
+        employee = await getUserDetails(
+          "employeeId",
+          task.employeeId,
+          companyDB
+        );
+        manager = await getUserDetails("employeeId", task.managerId, companyDB);
+        tasks[idx] = {
+          ...task["_doc"],
+          employeeEmail: employee["email"],
+          managerEmail: manager["email"],
+        };
+      }
+      return tasks;
+    })
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });
     });
@@ -125,7 +141,22 @@ router.get("/pto/get", async (req, res, next) => {
   userPTORequests["received"] = await PTORequestModel.find({
     managerId: user.employeeId,
   })
-    .then()
+    .then(async (tasks) => {
+      for (let [idx, task] of tasks.entries()) {
+        employee = await getUserDetails(
+          "employeeId",
+          task.employeeId,
+          companyDB
+        );
+        manager = await getUserDetails("employeeId", task.managerId, companyDB);
+        tasks[idx] = {
+          ...task["_doc"],
+          employeeEmail: employee["email"],
+          managerEmail: manager["email"],
+        };
+      }
+      return tasks;
+    })
     .catch((error) => {
       return res.json({ code: 500, status: "error", message: error.message });
     });

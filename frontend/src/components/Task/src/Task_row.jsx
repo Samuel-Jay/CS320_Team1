@@ -3,7 +3,6 @@ import "./Task_row.css";
 import { color } from '@mui/system';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import "./indiTask.jsx";
 import List from "@mui/material/List";
 import {useSelector} from 'react-redux';
 import ListItem from '@mui/material/ListItem'
@@ -21,6 +20,7 @@ const Task_row = () => {
     }, [dispatch])
 
     function handleClick(value){
+        console.log(value)
         setShow(value);
     }
     function handleWindow(task){
@@ -38,42 +38,38 @@ const Task_row = () => {
         <div>
 
             <List style={flexContainer}>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: "#005151", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="All"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
             </List>
-    
             { 
                 show==="All"?taskList.filter(task => {
                     return query === ""
-                            || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
-                            || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
-                            || task.taskDescription.toLowerCase().includes(query.toLowerCase())
-                            || task.taskLink.toLowerCase().includes(query.toLowerCase())
-                            || task.taskName.toLowerCase().includes(query.toLowerCase())
+                        || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
+                        || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
+                        || task.taskDescription.toLowerCase().includes(query.toLowerCase())
+                        || task.taskLink.toLowerCase().includes(query.toLowerCase())
+                        || task.taskName.toLowerCase().includes(query.toLowerCase())
+                }).map(task=>
+                    {
+                        console.log(task)
+                        return(
+                            <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
+                        )
+                    }):(taskList.filter(task=>{
+                        return show.toLowerCase()===task.status.toLowerCase()
                     }).map(task=>
                         {
                             return(
-                                <>  
-                                    <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
-                                </>
+                                <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                             )
-                        }):(taskList.filter(task=>{
-                            return show===task.status.toLowerCase()
-                        }).map(task=>
-                            {
-                                return(
-                                    <>
-                                        <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
-                                    </>
-                                )
-                            }
-                    ))
                         }
-                            
-                            </div>
-                        
-        ) 
+                    ))
+            }
+            
+        </div>
+        
+    ) 
 }
 export default Task_row;

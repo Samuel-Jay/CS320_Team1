@@ -1,17 +1,16 @@
 import React, {useState} from "react";
-import {useDispatch} from "react-redux";
+import {selectTask} from "../../../actions/Task.js"
+import {useDispatch, useSelector} from "react-redux";
 import {openTask, closeTask} from "../../../actions/Task.js";
 import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
-import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
-import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
 
 function Task(task){
     const dispatch = useDispatch();
     const[background,setbackground] = useState("#ffff");
     const[width_task,setwidth_task] = useState("100%");
     const [anchorEl, setAnchorEl] = useState(null);
-    const [openWindow, setOpenWindow] = useState(null);
-    const open = Boolean(anchorEl);
+    const checked = useSelector((state) => state.task.selectTask).includes(task.task)
+
     function handleClose(){
         setAnchorEl(null);
     }
@@ -25,7 +24,9 @@ function Task(task){
     function changeBackground(){
         setbackground("#F0F2F5");
     }
-    function change_status(){}
+    function changeStatus(task){
+        dispatch(selectTask(task.task));
+    }
     function handleWindow(task){
         dispatch(openTask(task.task));
     }
@@ -34,7 +35,7 @@ function Task(task){
     }
     return (
         <div className="EmailRow" style={{ backgroundColor: background,width :width_task }} onClick={()=>{changeBackground();changeWidth();handleWindow(task)}}>
-            <Checkbox  size="small" onChange={change_status(task)} style ={{color: "#199086",}}  />
+            <Checkbox  size="small" checked={checked} onChange={() => changeStatus(task)} style ={{color: "#199086",}}  />
             <div className="EmailRow_title">
                 {task.task.assignerEmail}
             </div>
@@ -51,7 +52,7 @@ function Task(task){
                 {task.task.dueDate.split("T")[0].split("-")[1]+"/"+task.task.dueDate.split("T")[0].split("-")[2]+"/"+task.task.dueDate.split("T")[0].split("-")[0]}
             </div>
         </div>
-    )
+                                                                           )
 }
 
 export default Task;

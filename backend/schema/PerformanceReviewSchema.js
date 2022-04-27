@@ -6,20 +6,9 @@ const PerformanceReview = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        reviewerEmail: {
-            type: String,
-            required: true,
-        },
         reviewerId: {
             type: Number,
             required: true,
-        },
-        reviewerManagerId: {
-            type: Number,
-            required: false,
-        },
-        revieweeEmail : {
-            type: String,
         },
         revieweeId: {
             type: Number,
@@ -34,36 +23,36 @@ const PerformanceReview = new mongoose.Schema(
             required: true,
         },
         companyName: {
-            type: Number,
+            type: String,
             required: true,
         },
         overallComments: {
             type: String,
-            required: true,
+            required: false,
         },
         growthFeedbackComments: {
             type: String,
-            required: true,
+            required: false,
         },
         growthFeedbackScore: {
             type: Number,
-            required: true,
+            required: false,
         },
         kindnessFeedbackComments: {
             type: String,
-            required: true,
+            required: false,
         },
         kindnessFeedbackScore: {
             type: Number,
-            required: true,
+            required: false,
         },
         deliveryFeedbackComments: {
             type: String,
-            required: true,
+            required: false,
         },
         deliveryFeedbackScore: {
             type: Number,
-            required: true,
+            required: false,
         },
         startDate: {
             type: Date,

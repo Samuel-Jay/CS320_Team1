@@ -43,3 +43,12 @@
     transform: rotate(360deg);
   }
 }
+.body{
+  display: flex;
+  flex-direction:row;
+}
+
+.main-body{
+  display: flex;
+  flex-direction: column;
+}

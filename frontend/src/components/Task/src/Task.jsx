@@ -1,15 +1,16 @@
 import React, {useState} from "react";
-import {useDispatch} from "react-redux";
-import {changeStatus} from "../../../actions/Task.js"
+import {selectTask} from "../../../actions/Task.js"
+import {useDispatch, useSelector} from "react-redux";
+import {openTask, closeTask} from "../../../actions/Task.js";
 import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
-import CircleCheckedOutline from "@mui/icons-material/CheckCircle";
-import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked";
+
 function Task(task){
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const[background,setbackground] = useState("#ffff");
+    const[width_task,setwidth_task] = useState("100%");
     const [anchorEl, setAnchorEl] = useState(null);
-    const [check, setCheck] = useState(false);
-    const open = Boolean(anchorEl);
+    const checked = useSelector((state) => state.task.selectTask).includes(task.task)
+
     function handleClose(){
         setAnchorEl(null);
     }
@@ -17,78 +18,41 @@ function Task(task){
         setAnchorEl(event.currentTarget);
     }
 
-    function change_background(){
+    function changeWidth(){
+        setwidth_task("70%");
+    }
+    function changeBackground(){
         setbackground("#F0F2F5");
     }
-
-    function change_status(status){
-        dispatch(changeStatus({task, status}))
+    function changeStatus(task){
+        dispatch(selectTask(task.task));
     }
-
-    function checked(){}
-
-    function handleChange(){
-        setCheck(prevState => !prevState)
+    function handleWindow(task){
+        dispatch(openTask(task.task));
     }
-
-    function open_task(){
+    function closeWindow(){
+        dispatch(closeTask());
     }
     return (
-        <div className="EmailRow" style={{ backgroundColor: background }} onClick={open_task}>
-            <div className = "Checkbox">
-                {
-                    check?(
-                        <Checkbox 
-                        onClick={handleChange}/>
-                    ):(                
-                    <Checkbox
-                        checked={checked}
-                        onClick={handleChange}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />
-                    )
-                }
-
+        <div className="EmailRow" style={{ backgroundColor: background,width :width_task }} onClick={()=>{changeBackground();changeWidth();handleWindow(task)}}>
+            <Checkbox  size="small" checked={checked} onChange={() => changeStatus(task)} style ={{color: "#199086",}}  />
+            <div className="EmailRow_title">
+                {task.task.assignerEmail}
             </div>
-            <h3 className=" EmailRow_title">
-                {task.task.taskName}
-            </h3>
             <div className="EmailRow_Subject">
+                
                 <h4>
+                    {task.task.taskName+":"}
                     <span className="EmailRow_Description">
                         {task.task.taskDescription}
                     </span>
                 </h4>
             </div>
-            <div className="time">
-                {task.task.dueDate}
+            <div className="EmailRow_time">
+                {task.task.dueDate.split("T")[0].split("-")[1]+"/"+task.task.dueDate.split("T")[0].split("-")[2]+"/"+task.task.dueDate.split("T")[0].split("-")[0]}
             </div>
-            {/* <div> */}
-                {/* <Button
-                    id="basic-button"
-                    aria-controls={open ? "basic-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                    onClick={handleClick}
-                >
-                    Change Status
-                </Button> */}
-                {/* <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                    MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                    }}
-                >
-                    <MenuItem onClick={() => {change_status("Archived")}}>Archive</MenuItem>
-                    <MenuItem onClick={() => {change_status("Incomplete")}}> Incomplete </MenuItem>
-                    <MenuItem onClick={() => {change_status("Completed")}}> Complete </MenuItem>
-                </Menu> */}
-            {/* </div> */}
         </div>
-    );
+                                                                           )
 }
 
 export default Task;

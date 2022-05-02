@@ -39,9 +39,50 @@ export const createTrainingTask = (formData) => async() => {
 
 export const getTrainingTask = () => async(dispatch) => {
     try{
-        const {email} = JSON.parse(localStorage.getItem("profile")).user;
-        const {data} = await taskAPI.getTrainingTask({requestorEmail : email});
+        const {data} = await taskAPI.getTrainingTask();
+        console.log(data)
         dispatch({type: "GETTASK", payload: data});
+    }catch(err){
+        console.log(err);
+    }
+};
+
+export const openTask = (task) => async(dispatch) => {
+    try{
+        dispatch({type: "OPENTASK", payload: task})
+    }catch(err){
+        console.log(err);
+    }
+};
+
+export const closeTask = () => async(dispatch) => {
+    try{
+        dispatch({type: "CLOSETASK", })
+        console.log("yooooooooooo");
+    }catch(err){
+        console.log(err);
+    }
+};
+
+export const searchTask = (query) => async(dispatch) => {
+    try{
+        dispatch({type: "SEARCHTASK", payload: query})
+    }catch(err){
+        console.log(err);
+    }
+};
+
+export const selectTask = (task) => async(dispatch) => {
+    try{
+        dispatch({type: "SELECTTASK", payload: task})
+    }catch(err){
+        console.log(err);
+    }
+};
+
+export const moveTask = (task) => async(dispatch) => {
+    try{
+        dispatch({type: "MOVETASK", payload: task})
     }catch(err){
         console.log(err);
     }

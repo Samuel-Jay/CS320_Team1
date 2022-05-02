@@ -1,11 +1,8 @@
 import { Checkbox } from '@mui/material';
 import "./Task_row.css";
-import CircleCheckedOutline from "@mui/icons-material/CheckCircle"
-import CircleUncheckedOutline from "@mui/icons-material/RadioButtonUnchecked"
 import { color } from '@mui/system';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import "./indiTask.jsx";
 import List from "@mui/material/List";
 import {useSelector} from 'react-redux';
 import ListItem from '@mui/material/ListItem'
@@ -13,82 +10,70 @@ import ListItemText from '@mui/material/ListItemText';
 import React, {useState, useEffect} from 'react';
 import Task from './Task.jsx'
 import {useDispatch} from 'react-redux';
-import {changeDisp, incomplete, complete, archive, getTrainingTask} from '../../../actions/Task.js';
+import {openTask, getTrainingTask} from '../../../actions/Task.js';
 
 const Task_row = () => {
-    const[background,setbackground] = useState("#ffff");
     const dispatch = useDispatch();
     const [show, setShow] = useState("all");
     useEffect(() => {
-        dispatch(getTrainingTask())
+        dispatch(getTrainingTask());
     }, [dispatch])
 
     function handleClick(value){
-        setShow(value)
+        console.log(value)
+        setShow(value);
+    }
+    function handleWindow(task){
+        dispatch(openTask(task))
     }
     const flexContainer ={
         display:'flex',
         flexDirection: 'row',
-        backgroundColor: background,
-        padding: 10,
+        backgroundColor: '#FFFFFF',
+        padding: 0,
     };
-
     const taskList=useSelector((state ) => state.task.taskList);
-    console.log(taskList)
+    const query = useSelector((state) => state.task.query);
     return(
-        <>
+        <div>
+
             <List style={flexContainer}>
-                <ListItem button variant="outlined" onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
-                <ListItem button variant="outlined" onClick={ () => {handleClick("Incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
-                <ListItem button variant="outlined" onClick={ () => {handleClick("Completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
-                <ListItem button variant="outlined" onClick={ () => {handleClick("Archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="All"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
+                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
             </List>
             { 
-                show==="All"?taskList.map(task=>
-
+                show==="All"?taskList.filter(task => {
+                    return query === ""
+                        // || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
+                        // || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
+                        || task.taskDescription.toLowerCase().includes(query.toLowerCase())
+                        || task.taskLink.toLowerCase().includes(query.toLowerCase())
+                        || task.taskName.toLowerCase().includes(query.toLowerCase())
+                }).map(task=>
                     {
+                        console.log(task)
                         return(
-                            <Task key={task._id} task={task}/>
+                            <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                         )
-                    }):( <></>
-                       )
-            }
-            { 
-                show==="Incomplete"?taskList
-                    .filter(task => task.status === "Incomplete")
-                    .map(task=>
-
+                    }):(taskList.filter(task=>{
+                        return show.toLowerCase()===task.status.toLowerCase()
+                            && (query === ""
+                                || task.taskDescription.toLowerCase().includes(query.toLowerCase())
+                                || task.taskLink.toLowerCase().includes(query.toLowerCase())
+                                || task.taskName.toLowerCase().includes(query.toLowerCase()))
+                    }).map(task=>
                         {
                             return(
-                                <Task key={task._id} task={task}/>
+                                <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                             )
-                    }):( <></>
-                       )
+                        }
+                    ))
             }
-            { 
-                show==="Completed"?taskList
-                    .filter(task => task.status === "Completed")
-                    .map(task=>
-                        {
-                            return(
-                                <Task key={task._id} task={task}/>
-                            )
-                        }):( <></>
-                           )
-            }
-            { 
-                show==="Archived"?taskList
-                    .filter(task => task.status === "Archived")
-                    .map(task=>
-                        {
-                            console.log(task)
-                            return(
-                                <Task key={task._id} task={task}/>
-                            )
-                        }):( <></>
-                           )
-            }
-        </>
+            
+        </div>
+        
     ) 
 }
 export default Task_row;

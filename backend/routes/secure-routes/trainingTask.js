@@ -77,57 +77,106 @@ router.get("/trainingTask/get", async (req, res, next) => {
   const TrainingTask = mongoose.connection
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
+  const getUserDetails = require("../../utils/").getUserDetails;
 
   await User.findOne({ email: req.body.requestorEmail })
     .then(async (user) => {
       userTrainingTasks = {};
-      await TrainingTask.find({ assigneeId: user.employeeId })
-        .then((tasks) => {
-          if (!tasks) {
-            return res.json({
-              code: 404,
-              status: "error",
-              message: "No assigned tasks found for the user",
-            });
+      userTrainingTasks["created"] = await TrainingTask.find({
+        assignerId: user.employeeId,
+      })
+        .then(async (tasks) => {
+          for (let [idx, task] of tasks.entries()) {
+            employee = await getUserDetails(
+              "employeeId",
+              task.assigneeId,
+              companyDB
+            );
+            admin = await getUserDetails(
+              "employeeId",
+              task.assignerId,
+              companyDB
+            );
+            tasks[idx] = {
+              ...task["_doc"],
+              assigneeEmail: employee["email"],
+              assignerEmail: admin["email"],
+            };
+            console.log(idx);
           }
-          userTrainingTasks["received"] = tasks;
+          return tasks;
         })
-        .catch((err) => {
+        .catch((error) => {
           return res.json({
             code: 500,
             status: "error",
-            message: err.message,
+            message: error.message,
           });
         });
-      await TrainingTask.find({ assignerId: user.employeeId })
-        .then((tasks) => {
-          if (!tasks) {
-            return res.json({
-              code: 404,
-              status: "error",
-              message: "User has not created any training tasks",
-            });
+
+      userTrainingTasks["received"] = await TrainingTask.find({
+        assigneeId: user.employeeId,
+      })
+        .then(async (tasks) => {
+          for (let [idx, task] of tasks.entries()) {
+            employee = await getUserDetails(
+              "employeeId",
+              task.assigneeId,
+              companyDB
+            );
+            admin = await getUserDetails(
+              "employeeId",
+              task.assignerId,
+              companyDB
+            );
+            tasks[idx] = {
+              ...task["_doc"],
+              assigneeEmail: employee["email"],
+              assignerEmail: admin["email"],
+            };
           }
-          userTrainingTasks["created"] = tasks;
+          return tasks;
         })
-        .catch((err) => {
+        .catch((error) => {
           return res.json({
             code: 500,
             status: "error",
-            message: "Internal server error",
+            message: error.message,
           });
         });
+      // userTrainingTasks = {};
+      // await TrainingTask.find({ assigneeId: user.employeeId }).then((tasks) => {
+      //   if (!tasks) {
+      //     return res.json({
+      //       code: 404,
+      //       status: "error",
+      //       message: "No assigned tasks found for the user",
+      //     });
+      //   }
+      //   userTrainingTasks["received"] = tasks;
+      // });
+
+      // await TrainingTask.find({ assignerId: user.employeeId }).then((tasks) => {
+      //   if (!tasks) {
+      //     return res.json({
+      //       code: 404,
+      //       status: "error",
+      //       message: "User has not created any training tasks",
+      //     });
+      //   }
+      //   userTrainingTasks["created"] = tasks;
+      // });
       return res.json({
         code: 200,
         status: "success",
         tasks: userTrainingTasks,
       });
     })
-    .catch((err) => {
+    .catch((error) => {
       return res.json({
         code: 500,
         status: "error",
-        message: "Internal server error",
+        message: error.message,
       });
     });
 });

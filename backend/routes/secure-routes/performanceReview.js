@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const PerformanceReviewSchema = require("../schema/PerformanceReviewSchema");
-const userSchema = require("../schema/UserSchema");
-const { companies } = require("../config");
-const { isUndefined } = require("util");
+const PerformanceReviewSchema = require("../../schema/PerformanceReviewSchema");
+const userSchema = require("../../schema/UserSchema");
+const { companies } = require("../../config");
+const generateHash = require("../../utils/hashIdGenerator");
+// const { isUndefined } = require("util");
 
 // const generateHash = (key) => {
 //     var hash = 0;
@@ -16,23 +17,6 @@ const { isUndefined } = require("util");
 //     }
 //     return hash;
 // };
-
-const generateHash = () => {
-    var today = new Date();
-    var date = `${
-        today.getUTCMonth() + 1}-${today.getUTCDate()}-${today.getFullYear()}`;
-    var time = `${today.getUTCHours()}-${today.getUTCMinutes()}-${today.getUTCSeconds()}`;
-    
-    var key = `${date} ${time}`;
-    var hash = 0;
-    
-    for (i = 0; i < key.length; i++) {
-        char = key.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash;
-    }
-    return Math.abs(hash);
-};  
 
 router.get("/profile", (req, res, next) => {
     res.json({
@@ -71,24 +55,24 @@ router.get("/profile", (req, res, next) => {
 router.post('/performanceReview/create', (req, res, next) => {
     console.log("test")
     try {
-        const companyDB = companies.get(req.body.email.split("@")[1]);
+        const companyDB = companies.get(req.user.email.split("@")[1]);
         const User = mongoose.connection
-            .useDb(companyDB)
-            .model("users", userSchema);
+              .useDb(companyDB)
+              .model("users", userSchema);
         const PerformanceReview = mongoose.connection
             .useDb(companyDB)
             .model("PerformanceReviews", PerformanceReviewSchema);
 
         User.findOne({ email: req.body.email }, async (err, user) => {
-            let allowed = User.find({managerId: user.managerId});
+            let allowed = await User.find({managerId: user.managerId});
             console.log(allowed);
             //if (!allowed.includes(req.body.reviewerId)) {
                 // return res.json({
                 //     message: "Cannot request review from an employee who isn't your peer."
                 // });
             //}
-            if (!User.find({managerId: user.employeeId}.includes(
-                req.body.revieweeId) && req.body.revieweeId == user.employeeId)) {
+            if (!await User.find({managerId: user.employeeId}.includes(
+                req.body.reviewerId) && req.body.revieweeId == user.employeeId)) {
                 return res.json({
                     message: "Cannot request review from employee who isn't peer or subordinate."
                 });
@@ -104,10 +88,7 @@ router.post('/performanceReview/create', (req, res, next) => {
             }
             var taskData = {
                 taskId: Math.abs(generateHash()),
-                reviewerEmail: req.body.reviewerEmail,
-                reviewerId: req.body.reviewerId,
-                reviewerManagerId: User.find({employeeId: reviewerId}).managerId,
-                revieweeEmail: user.email,
+                reviewerId: reviewer.employeeId,
                 revieweeId: user.employeeId,
                 revieweeManagerId: user.managerId,
                 companyId: user.companyId,
@@ -119,8 +100,9 @@ router.post('/performanceReview/create', (req, res, next) => {
                 kindnessFeedbackScore: req.body.kindnessFeedbackScore,
                 deliveryFeedbackComments: req.body.deliveryFeedbackComments,
                 deliveryFeedbackScore: req.body.deliveryFeedbackScore,
+                startDate: req.body.startDate,
                 dueDate: req.body.dueDate,
-                status: req.body.status
+                status: req.body.status,
             };
             const performanceReview = await PerformanceReview.create(taskData);
             await performanceReview.save();
@@ -128,7 +110,7 @@ router.post('/performanceReview/create', (req, res, next) => {
                 code: 200,
                 message: "Successfully added Performance Review.",
             });
-        });  
+        });
     } catch (error) {
         return res.json(error);
     }
@@ -136,14 +118,15 @@ router.post('/performanceReview/create', (req, res, next) => {
 
 router.post("/performanceReview/get", async (req, res, next) => {
     const companyDB = companies.get(req.body.email.split("@")[1]);
-    const User = mongoose.connection
-            .useDb(companyDB)
-            .model("users", userSchema);
+    const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
     const PerformanceReview = mongoose.connection
-        .useDb(companyDB)
-        .model("PerformanceReviews", PerformanceReviewSchema);
+          .useDb(companyDB)
+          .model("PerformanceReviews", PerformanceReviewSchema);
     userPerformanceReviews = {};
-    PerformanceReview.find({ reviewerEmail: req.body.email, status: {$in: ["in progress", "to be done"]} })
+    PerformanceReview.find({
+        reviewerEmail: req.body.email,
+        status: { $in: ["in progress", "to be done"] },
+    })
         .then((reviewTasks) => {
             if (!reviewTasks) {
                 return res.json({
@@ -159,7 +142,10 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    PerformanceReview.find({ revieweeEmail:req.body.email, status: "to be done" })
+    PerformanceReview.find({
+        revieweeEmail: req.body.email,
+        status: "to be done",
+    })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({
@@ -175,7 +161,10 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    PerformanceReview.find({ revieweeManagerId:req.body.revieweeManagerId, status: {$in: ["completed", "approved"]} })
+    PerformanceReview.find({
+        revieweeManagerId: req.body.revieweeManagerId,
+        status: { $in: ["completed", "approved"] },
+    })
         .then((tasks) => {
             if (!tasks) {
                 return res.json({
@@ -198,15 +187,15 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const User = mongoose.connection
-            .useDb(companyDB)
-            .model("users", userSchema);
+              .useDb(companyDB)
+              .model("users", userSchema);
         const PerformanceReview = mongoose.connection
-            .useDb(companyDB)
-            .model("PerformanceReviews", PerformanceReviewSchema);
+              .useDb(companyDB)
+              .model("PerformanceReviews", PerformanceReviewSchema);
 
         PerformanceReview.findOne(
             {
-                reviewerId: User.find({employeeId: req.body.reviewerId}),
+                reviewerId: User.find({ employeeId: req.body.reviewerId }),
             },
             (err, reviewTask) => {
                 if (!reviewTask) {
@@ -215,8 +204,10 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                         message: "No reviews found.",
                     });
                 }
-                const user = User.find({employeeId: reviewTask.reviewerId,
-                email: reviewerEmail})
+                const user = User.find({
+                    employeeId: reviewTask.reviewerId,
+                    email: reviewerEmail,
+                });
                 if (req.body.email === user.email) {
                     if (new Date() >= req.body.dueDate) {
                         PerformanceReview.updateOne(
@@ -226,7 +217,8 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                                 // taskId: Math.abs(generateHash()),
                                 reviewerEmail: req.body.reviewerEmail,
                                 reviewerId: req.body.reviewerId,
-                                reviewerManagerId: User.find({employeeId: reviewerId}).managerId,
+                                reviewerManagerId: User.find({ employeeId: reviewerId })
+                                    .managerId,
                                 revieweeEmail: user.email,
                                 revieweeId: user.employeeId,
                                 revieweeManagerId: user.managerId,
@@ -240,7 +232,7 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                                 deliveryFeedbackComments: "",
                                 deliveryFeedbackScore: undefined,
                                 dueDate: req.body.dueDate,
-                                status: "complete"
+                                status: "complete",
                             },
                             {
                                 ...req.body,
@@ -252,33 +244,38 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                             });
                         });
                         return res.json({
-                            message: "Cannot make changes past due date."
+                            message: "Cannot make changes past due date.",
                         });
                     }
-                    if (req.body.status == 'approved' ||
-                    req.body.status == 'complete') {
+                    if (req.body.status == "approved" || req.body.status == "complete") {
                         return res.json({
-                            message: "Cannot make changes after completion or approval."
+                            message: "Cannot make changes after completion or approval.",
                         });
                     }
-                    if (len(req.body.overallComments) == 0 & isAlpha(req.body.overallComments)) {
+                    if (
+                        (len(req.body.overallComments) == 0) &
+                            isAlpha(req.body.overallComments)
+                    ) {
                         return res.json({
-                            message: "Cannot provide unjustified rating score."
+                            message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.growthFeedback) == 0) {
+                    if (len(req.body.growthFeedback) == 0 &
+                    isAlpha(req.body.overallComments)) {
                         return res.json({
-                            message: "Cannot provide unjustified rating score."
+                            message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.kindnessFeedback) == 0) {
+                    if (len(req.body.kindnessFeedback) == 0 &
+                    isAlpha(req.body.overallComments)) {
                         return res.json({
-                            message: "Cannot provide unjustified rating score."
+                            message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.deliveryFeedback) == 0) {
+                    if (len(req.body.deliveryFeedback) == 0 &
+                    isAlpha(req.body.overallComments)) {
                         return res.json({
-                            message: "Cannot provide unjustified rating score."
+                            message: "Cannot provide unjustified rating score.",
                         });
                     }
                     PerformanceReview.updateOne(
@@ -288,7 +285,8 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                             // taskId: Math.abs(generateHash()),
                             reviewerEmail: req.body.reviewerEmail,
                             reviewerId: req.body.reviewerId,
-                            reviewerManagerId: User.find({employeeId: reviewerId}).managerId,
+                            reviewerManagerId: User.find({ employeeId: reviewerId })
+                                .managerId,
                             revieweeEmail: user.email,
                             revieweeId: user.employeeId,
                             revieweeManagerId: user.managerId,
@@ -302,7 +300,7 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                             deliveryFeedbackComments: req.body.deliveryFeedbackComments,
                             deliveryFeedbackScore: req.body.deliveryFeedbackScore,
                             dueDate: req.body.dueDate,
-                            status: req.body.status
+                            status: req.body.status,
                         },
                         {
                             ...req.body,
@@ -313,9 +311,13 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                             message: "Performance Review updated successfully",
                         });
                     });
-                } else if (req.body.email === reviewTask.revieweeEmail ||
-                    User.find({employeeId: reviewTask.revieweeId,
-                    email: reviewTask.revieweeEmail})) {
+                } else if (
+                    req.body.email === reviewTask.revieweeEmail ||
+                        User.find({
+                            employeeId: reviewTask.revieweeId,
+                            email: reviewTask.revieweeEmail,
+                        })
+                ) {
                     return res.json({
                         message: "Does not have edit permissions on this review.",
                     });
@@ -331,8 +333,8 @@ router.delete("/PerformanceReview/delete", (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
         const PerformanceReview = mongoose.connection
-            .useDb(companyDB)
-            .model("assignTraining", trainingSchema);
+              .useDb(companyDB)
+              .model("assignTraining", trainingSchema);
 
         PerformanceReview.findOne(
             {

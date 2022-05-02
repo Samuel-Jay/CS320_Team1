@@ -6,7 +6,8 @@ import {useDispatch} from "react-redux";
 import {signin} from "../../actions/User.js";
 import {useNavigate} from "react-router-dom";
 import {getEmployees} from "../../actions/Task.js";
-
+import background from '../../styles/img/background.png';
+  
 function Auth(){
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -26,7 +27,7 @@ function Auth(){
                 ()=>{
                     if(localStorage.getItem("profile")){
                         dispatch(getEmployees());
-                        navigate("/");
+                        navigate("/TaskBox");
                     }else{
                         setHasFailed(true);
                     }
@@ -47,13 +48,14 @@ function Auth(){
     }
     return(
         <form onSubmit={handleSubmit}>
+            <div style = {{width: '100%', height: '100%', backgroundImage: `url(${background})`}}>
             <Grid container spacing={0} alignItems="center" justifyContent="center" style={{minHeight: "100vh" }}>
                 <Paper elevation={3} >
                     <Box p={3}>
                         <Grid container spacing={2} aign="center" justifyContent="center">
                             <img src={logo} alt={logo} width={100} height={100} align="center"/>
                         </Grid>
-                        <Typography align="center" variant="h5">{isSignup ? "Sign Up" : "Sign in"}</Typography>
+                        <Typography align="center" variant="h5" >{isSignup ? "Sign Up" : "Sign in"}</Typography>
                         {isSignup && (
                             <>
                                 <Grid container >
@@ -75,8 +77,8 @@ function Auth(){
                         )}
                         <Grid>
                             <div/>
-                            <Button type="submit" align="center" variant="contained" fullWidth>{isSignup?"Sign Up": "Sign In"}</Button>
-                            <Button align="center" onClick={toggleSignup}>{isSignup ? "Already have an account? Sign in":"Don't have an account? Sign up"}</Button>
+                            <Button type="submit" align="center" variant="contained" style={{background: "#005151" }} fullWidth>{isSignup?"Sign Up": "Sign In"} </Button>
+                            <Button align="center" style={{ color: '#005151' }}  onClick={toggleSignup}>{isSignup ? "Already have an account? Sign in":"Don't have an account? Sign up"}</Button>
                             {
                                 hasFailed && (
                                     <Typography>Error, invalid login</Typography>
@@ -87,6 +89,7 @@ function Auth(){
                     </Box>
                 </Paper>
             </Grid>
+            </div>
         </form>
     );
 }

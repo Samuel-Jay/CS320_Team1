@@ -1,5 +1,5 @@
 import { Checkbox } from '@mui/material';
-import "./Task_row.css";
+import "./TaskRow.css";
 import { color } from '@mui/system';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,19 +10,16 @@ import ListItemText from '@mui/material/ListItemText';
 import React, {useState, useEffect} from 'react';
 import Task from './Task.jsx'
 import {useDispatch} from 'react-redux';
-import {openTask, getTrainingTask} from '../../../actions/Task.js';
+import {openTask} from '../../actions/Task.js';
+import {getTrainingTask} from '../../actions/TrainingTask.js';
 
-const Task_row = () => {
+const TraningTasks = () => {
     const dispatch = useDispatch();
-    const [show, setShow] = useState("all");
     useEffect(() => {
+        console.log("use effecting")
         dispatch(getTrainingTask());
     }, [dispatch])
 
-    function handleClick(value){
-        console.log(value)
-        setShow(value);
-    }
     function handleWindow(task){
         dispatch(openTask(task))
     }
@@ -32,22 +29,17 @@ const Task_row = () => {
         backgroundColor: '#FFFFFF',
         padding: 0,
     };
-    const taskList=useSelector((state ) => state.task.taskList);
+    let taskList=useSelector((state ) => state.TrainingTask.taskList);
+    console.log(taskList)
     const query = useSelector((state) => state.task.query);
+    const show = useSelector((state) => state.task.status);
     return(
         <div>
-
-            <List style={flexContainer}>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="All"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("All")}}><ListItemText align="center" primary="All"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Incomplete"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Incomplete")}}><ListItemText align="center" primary="Uncompleted Tasks"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Completed"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Completed")}}><ListItemText align="center" primary="Completed Tasks"/> </ListItem>
-                <ListItem button variant="outlined" style={{color: '#FFFFFF'}} sx={{backgroundColor: show=="Archived"?"#005151":"#199086", '&:hover':{bgcolor:"#20B3A7"}}} onClick={ () => {handleClick("Archived")}}><ListItemText align="center" primary="Archived Tasks"/> </ListItem>
-            </List>
             { 
                 show==="All"?taskList.filter(task => {
                     return query === ""
-                        // || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
-                        // || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
+                    // || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
+                    // || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
                         || task.taskDescription.toLowerCase().includes(query.toLowerCase())
                         || task.taskLink.toLowerCase().includes(query.toLowerCase())
                         || task.taskName.toLowerCase().includes(query.toLowerCase())
@@ -76,4 +68,4 @@ const Task_row = () => {
         
     ) 
 }
-export default Task_row;
+export default TraningTasks;

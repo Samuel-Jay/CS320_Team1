@@ -10,7 +10,7 @@ import {useDispatch} from 'react-redux';
 import {useSelector} from 'react-redux';
 import {signin} from '../../actions/User.js';
 import {useNavigate} from 'react-router-dom';
-import {createTrainingTask} from '../../actions/Task.js';
+import {createTrainingTask} from '../../actions/TrainingTask.js';
 
 function TrainingForm(){
     const dispatch = useDispatch();

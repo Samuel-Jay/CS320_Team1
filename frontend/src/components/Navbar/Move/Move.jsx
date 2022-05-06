@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { Link, Menu, MenuItem, Typography, Toolbar, AppBar, Box, Button, Avatar, IconButton } from '@mui/material'
-import "./Task_row.css";
+import "./index.css";
 import {useDispatch, useSelector} from 'react-redux';
 import {moveTask} from '../../../actions/Task.js';
 

@@ -5,7 +5,7 @@ import { Menu, MenuItem, Typography, Toolbar, AppBar, Box, Button, IconButton } 
 import {Link } from 'react-router-dom'
 import TaskForm from '../TaskForm/TaskForm.jsx'
 import AvatarIcon from './AvatarIcon.jsx'
-import Move from '../Task/src/Move.jsx'
+import Move from './Move//Move.jsx'
 import iconButton from '@mui/material/IconButton';
 import logo from '../../styles/img/logo.png';
 import Searchbar from '../Searchbar/Searchbar.jsx'
@@ -20,7 +20,7 @@ function Navbar(){
         setUser(JSON.parse(localStorage.getItem('profile')));
     },[location, dispatch]);
     return(
-        <AppBar position="sticky" variant="dense" style={{ background: '#199086' }}  sx={{ boxShadow: 3 }}>
+        <AppBar position="sticky" variant="dense" style={{ background: '#199086' }}  sx={{ boxShadow: 2 }}>
 	    <Toolbar>
                 <img src={logo} width="100" ></img>
                 <Searchbar/>

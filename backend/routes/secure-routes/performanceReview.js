@@ -63,7 +63,7 @@ router.post("/performanceReview/create", (req, res, next) => {
               .model("PerformanceReviews", PerformanceReviewSchema);
         User.findOne({ _id: req.user._id }, async (err, user) => {
             const reviewer = await User.findOne({email: req.body.reviewerEmail});
-            if (reviewer.managerId !== user.managerId && reviewer.managerId !== user.employeeId) {
+            if ((reviewer.managerId !== user.managerId && reviewer.managerId !== user.employeeId) || reviewer.employeeId === user.employeeId) {
                 return res.status(400).json({
                     message:
                     "Cannot request review from an employee who isn't your peer.",
@@ -100,14 +100,14 @@ router.post("/performanceReview/create", (req, res, next) => {
 });
 
 router.post("/performanceReview/get", async (req, res, next) => {
-    const companyDB = companies.get(req.body.email.split("@")[1]);
+    const companyDB = companies.get(req.user.email.split("@")[1]);
     const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
     const PerformanceReview = mongoose.connection
           .useDb(companyDB)
           .model("PerformanceReviews", PerformanceReviewSchema);
     userPerformanceReviews = {};
-    PerformanceReview.find({
-        reviewerEmail: req.body.email,
+    await PerformanceReview.find({
+        reviewerEmail: req.user.email,
         status: { $in: ["in progress", "to be done"] },
     })
         .then((reviewTasks) => {
@@ -125,8 +125,8 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    PerformanceReview.find({
-        revieweeEmail: req.body.email,
+    await PerformanceReview.find({
+        revieweeEmail: req.user.email,
         status: "to be done",
     })
         .then((tasks) => {
@@ -144,7 +144,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
-    PerformanceReview.find({
+    await PerformanceReview.find({
         revieweeManagerId: req.body.revieweeManagerId,
         status: { $in: ["completed", "approved"] },
     })
@@ -155,7 +155,7 @@ router.post("/performanceReview/get", async (req, res, next) => {
                     message: "User has not created any performance reviews",
                 });
             }
-            userPerformanceReviews["created"] = tasks;
+            userPerformanceReviews["received"] = tasks;
         })
         .catch((err) =>
             res.json({
@@ -163,6 +163,13 @@ router.post("/performanceReview/get", async (req, res, next) => {
                 message: err.message,
             })
         );
+    userPerformanceReviews['created'] = userPerformanceReviews['created'].filter(function (reviews) {
+       return (reviews.revieweeId === User.findOne({email:req.user.email}).employeeId && reviews.status === 'to be done');
+    });
+    userPerformanceReviews['received'] = userPerformanceReviews['received'].filter(function (reviews) {
+        return (reviews.revieweeManagerId === User.findOne({email:req.user.email}).employeeId && (reviews.status === 'complete' || reviews.status === 'approved')) ||
+        (reviews.reviewerId === User.findOne({email:req.user.email}).employeeId && (reviews.status === 'to be done' || reviews.status === 'in progress'));
+    });
     return res.json(userPerformanceReviews);
 });
 
@@ -243,17 +250,20 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.growthFeedback) == 0) {
+                    if (len(req.body.growthFeedback) == 0 &
+                    isAlpha(req.body.growthFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.kindnessFeedback) == 0) {
+                    if (len(req.body.kindnessFeedback) == 0 &
+                    isAlpha(req.body.kindnessFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.deliveryFeedback) == 0) {
+                    if (len(req.body.deliveryFeedback) == 0 &
+                    isAlpha(req.body.deliveryFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });

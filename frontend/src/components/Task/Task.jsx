@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import {selectTask} from "../../../actions/Task.js"
+import {selectTask} from "../../actions/Task.js"
 import {useDispatch, useSelector} from "react-redux";
-import {openTask, closeTask} from "../../../actions/Task.js";
+import {openTask, closeTask} from "../../actions/Task.js";
 import {Checkbox, Button, Menu, MenuItem}  from "@mui/material";
 
 function Task(task){
@@ -9,7 +9,7 @@ function Task(task){
     const[background,setbackground] = useState("#ffff");
     const[width_task,setwidth_task] = useState("100%");
     const [anchorEl, setAnchorEl] = useState(null);
-    const checked = useSelector((state) => state.task.selectTask).includes(task.task)
+    const checked = useSelector((state) => state.TrainingTask.selectTask).includes(task.task)
 
     function handleClose(){
         setAnchorEl(null);

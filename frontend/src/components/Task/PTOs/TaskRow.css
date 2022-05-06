@@ -1,0 +1,56 @@
+/*@font-face {
+    font-family: robot;
+    src: url(./Roboto/Roboto-Regular.ttf);
+  }*/
+.EmailRow {
+  display: flex;
+  align-items: center;
+  width: auto;
+  height: 50px;
+  border-bottom: 1px solid whitesmoke;
+  cursor: pointer;
+  z-index: 999;
+}
+.EmailRow:hover {
+  border-top: 1px solid whitesmoke;
+  box-shadow: 0px 4px 4px -2px rgba(0, 0, 0, 0.24);
+}
+.EmailRow .EmailRow_title {
+  font-size: 14px;
+  font-family: robot;
+}
+
+.EmailRow .EmailRow_Subject {
+  color: #005151;
+  overflow: visible;
+  align-items: center;
+  font-size: 14px;
+  font-family: robot;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+ .EmailRow .EmailRow_Subject  h4 {
+  width: 70%;
+  white-space: nowrap;
+  /* overflow: hidden; */
+  text-overflow: ellipsis;
+  padding-left: 5px;
+  padding-right: 5px;
+} 
+.EmailRow .EmailRow_Subject .EmailRow_Description {
+  color: gray;
+  flex-shrink: 1;
+}
+
+.EmailRow .EmailRow_time  {
+  font-size: 14px;
+  font-family: robot;
+  flex-shrink: 1;
+  padding-right: 10%;
+} 
+
+.task-list{
+  display: flex;
+  flex-direction: row;
+}

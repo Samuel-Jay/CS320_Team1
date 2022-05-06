@@ -32,6 +32,11 @@ const PTOSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+
+    approved: {
+        type: String,
+        required: false,
+    },
     status: {
       type: String,
       required: true,

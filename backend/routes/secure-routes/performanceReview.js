@@ -5,54 +5,20 @@ const PerformanceReviewSchema = require("../../schema/PerformanceReviewSchema");
 const userSchema = require("../../schema/UserSchema");
 const { companies } = require("../../config");
 const generateHash = require("../../utils/hashIdGenerator");
-// const { isUndefined } = require("util");
 
-// const generateHash = (key) => {
-//     var hash = 0;
-//     if (key.length == 0) return hash;
-//     for (i = 0; i < key.length; i++) {
-//         char = key.charCodeAt(i);
-//         hash = (hash << 5) - hash + char;
-//         hash = hash & hash;
-//     }
-//     return hash;
-// };
+router.get("/performanceReview/employee", async (req, res, next) => {
+    const companyDB = companies.get(req.user.email.split("@")[1]);
+    const User = mongoose.connection
+          .useDb(companyDB)
+          .model("users", userSchema);
+    const user = await User.findOne({_id: req.user._id})
+    const employee = await User.find({managerId: user.managerId})
+    const manager = await User.findOne({employeeId: user.managerId})
+    let result = [...employee, manager]
+    return res.status(200).json({result});
+})
 
-router.get("/profile", (req, res, next) => {
-    res.json({
-        message: "You made it to the secure route",
-        user: req.user,
-        token: req.query.secret_token,
-    });
-});
-
-// router.post("/employees/get", async (req, res, next) => {
-//     const companyDB = companies.get(req.body.email.split("@")[1]);
-//     const User = mongoose.connection
-//         .useDb(companyDB)
-//         .model("users", userSchema);
-//     respond = {};
-//     await User.find({ managerId: req.body.employeeId })
-//         .then((employees) => {
-//             if (!employees) {
-//                 return res.json({
-//                     code: 404,
-//                     message: "No employees under management",
-//                 });
-//             }
-//             respond["employees"] = employees;
-//         })
-//         .catch((err) =>
-//             res.json({
-//                 code: 500,
-//                 message: err.message,
-//             })
-//         );
-
-//     return res.json(respond);
-// });
-
-router.post("/performanceReview/create", (req, res, next) => {
+router.post("/performanceReview/create", async (req, res, next) => {
     try {
         const companyDB = companies.get(req.user.email.split("@")[1]);
         const User = mongoose.connection
@@ -63,7 +29,7 @@ router.post("/performanceReview/create", (req, res, next) => {
               .model("PerformanceReviews", PerformanceReviewSchema);
         User.findOne({ _id: req.user._id }, async (err, user) => {
             const reviewer = await User.findOne({email: req.body.reviewerEmail});
-            if (reviewer.managerId !== user.managerId && reviewer.managerId !== user.employeeId) {
+            if ((reviewer.managerId !== user.managerId && reviewer.managerId !== user.employeeId) || reviewer.employeeId === user.employeeId) {
                 return res.status(400).json({
                     message:
                     "Cannot request review from an employee who isn't your peer.",
@@ -74,18 +40,16 @@ router.post("/performanceReview/create", (req, res, next) => {
                 reviewerId: reviewer.employeeId,
                 revieweeId: user.employeeId,
                 revieweeManagerId: user.managerId,
-                companyId: user.companyId,
-                companyName: user.companyName,
-                overallComments: req.body.overallComments,
-                growthFeedbackComments: req.body.growthFeedbackComments,
-                growthFeedbackScore: req.body.growthFeedbackScore,
-                kindnessFeedbackComments: req.body.kindnessFeedbackComments,
-                kindnessFeedbackScore: req.body.kindnessFeedbackScore,
-                deliveryFeedbackComments: req.body.deliveryFeedbackComments,
-                deliveryFeedbackScore: req.body.deliveryFeedbackScore,
+                overallComments: "",
+                growthFeedbackComments: "",
+                growthFeedbackScore: 0,
+                kindnessFeedbackComments: "",
+                kindnessFeedbackScore: 0,
+                deliveryFeedbackComments: "",
+                deliveryFeedbackScore: 0,
                 startDate: req.body.startDate,
                 dueDate: req.body.dueDate,
-                status: req.body.status,
+                status: "Incomplete",
             };
             const performanceReview = await PerformanceReview.create(taskData);
             await performanceReview.save();
@@ -99,74 +63,96 @@ router.post("/performanceReview/create", (req, res, next) => {
     }
 });
 
-router.post("/performanceReview/get", async (req, res, next) => {
-    const companyDB = companies.get(req.body.email.split("@")[1]);
+router.get("/performanceReview/get", async (req, res, next) => {
+    const companyDB = companies.get(req.user.email.split("@")[1]);
     const User = mongoose.connection.useDb(companyDB).model("users", userSchema);
     const PerformanceReview = mongoose.connection
           .useDb(companyDB)
           .model("PerformanceReviews", PerformanceReviewSchema);
-    userPerformanceReviews = {};
-    PerformanceReview.find({
-        reviewerEmail: req.body.email,
-        status: { $in: ["in progress", "to be done"] },
-    })
-        .then((reviewTasks) => {
-            if (!reviewTasks) {
-                return res.json({
-                    code: 404,
-                    message: "No reviews found for the user to do.",
-                });
-            }
-            userPerformanceReviews["received"] = reviewTasks;
-        })
-        .catch((err) =>
-            res.json({
-                code: 500,
-                message: err.message,
+    const getUserDetails = require("../../utils/").getUserDetails;
+    await User.findOne({ email: req.user.email })
+        .then(async (user) => {
+            console.log(user.employeeId)
+            userPerformanceReviews = {};
+            userPerformanceReviews["created"] = await PerformanceReview.find({
+                $or:[{revieweeId: user.employeeId}]
             })
-        );
-    PerformanceReview.find({
-        revieweeEmail: req.body.email,
-        status: "to be done",
-    })
-        .then((tasks) => {
-            if (!tasks) {
-                return res.json({
-                    code: 404,
-                    message: "User has not created any performance reviews",
+                .then(async (tasks) => {
+                    console.log(tasks)
+                    for (let [idx, task] of tasks.entries()) {
+                        reviewer = await getUserDetails(
+                            "employeeId",
+                            task.reviewerId,
+                            companyDB
+                        );
+                        reviewee = await getUserDetails(
+                            "employeeId",
+                            task.revieweeId,
+                            companyDB
+                        );
+                        tasks[idx] = {
+                            ...task["_doc"],
+                            reviewerEmail: reviewer["email"],
+                            revieweeEmail: reviewee["email"],
+                        };
+                        console.log(idx);
+                    }
+                    return tasks;
+                })
+                .catch((error) => {
+                    return res.json({
+                        code: 500,
+                        status: "error",
+                        message: error.message,
+                    });
                 });
-            }
-            userPerformanceReviews["created"] = tasks;
-        })
-        .catch((err) =>
-            res.json({
-                code: 500,
-                message: err.message,
+
+            userPerformanceReviews["received"] = await PerformanceReview.find({
+                $or:[{reviewerId: user.employeeId}, {revieweeManagerId: user.employeeId} ]
             })
-        );
-    PerformanceReview.find({
-        revieweeManagerId: req.body.revieweeManagerId,
-        status: { $in: ["completed", "approved"] },
-    })
-        .then((tasks) => {
-            if (!tasks) {
-                return res.json({
-                    code: 404,
-                    message: "User has not created any performance reviews",
+                .then(async (tasks) => {
+                    for (let [idx, task] of tasks.entries()) {
+                        reviewer = await getUserDetails(
+                            "employeeId",
+                            task.reviewerId,
+                            companyDB
+                        );
+                        reviewee = await getUserDetails(
+                            "employeeId",
+                            task.revieweeId,
+                            companyDB
+                        );
+                        tasks[idx] = {
+                            ...task["_doc"],
+                            reviewerEmail: reviewer["email"],
+                            revieweeEmail: reviewee["email"],
+                        };
+                    }
+                    return tasks;
+                })
+                .catch((error) => {
+                    return res.json({
+                        code: 500,
+                        status: "error",
+                        message: error.message,
+                    });
                 });
-            }
-            userPerformanceReviews["created"] = tasks;
+            return res.json({
+                code: 200,
+                status: "success",
+                tasks: userPerformanceReviews,
+            });
         })
-        .catch((err) =>
-            res.json({
+        .catch((error) => {
+            return res.json({
                 code: 500,
-                message: err.message,
-            })
-        );
-    return res.json(userPerformanceReviews);
+                status: "error",
+                message: error.message,
+            });
+        });
 });
 
-router.patch("/PerformanceReview/edit", (req, res, next) => {
+router.patch("/PerformanceReview/edit", async (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const User = mongoose.connection
@@ -243,17 +229,20 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.growthFeedback) == 0) {
+                    if (len(req.body.growthFeedback) == 0 &
+                        isAlpha(req.body.growthFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.kindnessFeedback) == 0) {
+                    if (len(req.body.kindnessFeedback) == 0 &
+                        isAlpha(req.body.kindnessFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
-                    if (len(req.body.deliveryFeedback) == 0) {
+                    if (len(req.body.deliveryFeedback) == 0 &
+                        isAlpha(req.body.deliveryFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
@@ -309,7 +298,7 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
     }
 });
 
-router.delete("/PerformanceReview/delete", (req, res, next) => {
+router.delete("/PerformanceReview/delete",  async (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
         const PerformanceReview = mongoose.connection

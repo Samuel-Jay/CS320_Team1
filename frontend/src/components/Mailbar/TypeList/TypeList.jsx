@@ -1,14 +1,18 @@
-import React, {useDispatch, useSelector} from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import {useDispatch, useSelector} from 'react-redux'
+import {changeType} from '../../../actions/Task.js'
 
 export default function BasicSelect() {
-    const [type, setType] = React.useState('Training');
-
+    const dispatch = useDispatch();
+    const current = useSelector(state=>state.task.type)
+    const [type, setType] = React.useState(current);
     const handleChange = (e) => {
+        dispatch(changeType(e.target.value))
         setType(e.target.value)
     };
 

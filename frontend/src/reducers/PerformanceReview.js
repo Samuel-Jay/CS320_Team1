@@ -1,6 +1,6 @@
 function trainingTaskReducer(state = {taskList:[], sentList: []}, action){
     switch(action.type){
-    case "GETTRAININGTASK":
+    case "GETPERFORMANCEREVIEW":
         return {...state, taskList: action.payload.tasks.received, sentList: action.payload.tasks.sent};
     case "MOVETASK":
         const newTaskList = state.taskList.map(task => {

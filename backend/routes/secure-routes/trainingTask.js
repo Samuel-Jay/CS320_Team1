@@ -13,62 +13,53 @@ router.post("/trainingTask/create", async (req, res, next) => {
     .useDb(companyDB)
     .model("assignTraining", trainingSchema);
 
-  await User.findOne({ email: req.body.assignerEmail })
-    .then(async (admin) => {
-      if (!admin) {
-        return res.json({
-          code: 404,
-          status: "error",
-          message: "Assigner email doesn't exist",
-        });
-      }
-      if (admin.positionTitle !== "CEO") {
-        return res.json({
-          code: 401,
-          status: "error",
-          message: "Assigner does not have Admin permissions",
-        });
-      }
-      await User.find({})
-        .then((users) => {
-          employees = users.filter((user) => user.positionTitle !== "CEO");
-
-          employees.forEach(async (employee) => {
-            var taskData = {
-              taskId: generateHash(),
-              assignerId: admin.employeeId,
-              assigneeId: employee.employeeId,
-              taskName: req.body.taskName,
-              taskLink: req.body.taskLink,
-              taskDescription: req.body.taskDescription,
-              startDate: req.body.startDate,
-              dueDate: req.body.dueDate,
-              status: "Incomplete",
-            };
-            const trainingTask = await TrainingTask.create(taskData);
-            await trainingTask.save();
-          });
-          return res.json({
-            code: 200,
-            status: "success",
-            message: "Successfully added training tasks",
-          });
+    await User.findOne({ email: req.user.email })
+        .then(async (manager) => {
+            if (!manager) {
+                return res.json({
+                    code: 404,
+                    status: "error",
+                    message: "Assigner email doesn't exist",
+                });
+            }
+            await User.find({managerId: manager.employeeId})
+                .then((employees) => {
+                    employees.forEach(async (employee) => {
+                        var taskData = {
+                            taskId: generateHash(),
+                            assignerId: manager.employeeId,
+                            assigneeId: employee.employeeId,
+                            taskName: req.body.taskName,
+                            taskLink: req.body.taskLink,
+                            taskDescription: req.body.taskDescription,
+                            startDate: req.body.startDate,
+                            dueDate: req.body.dueDate,
+                            status: "Incomplete",
+                        };
+                        const trainingTask = await TrainingTask.create(taskData);
+                        await trainingTask.save();
+                    });
+                    return res.json({
+                        code: 200,
+                        status: "success",
+                        message: "Successfully added training tasks",
+                    });
+                })
+                .catch((error) => {
+                    return res.json({
+                        code: 500,
+                        status: "error",
+                        message: "Internal server error",
+                    });
+                });
         })
         .catch((error) => {
-          return res.json({
-            code: 500,
-            status: "error",
-            message: "Internal server error",
-          });
+            return res.json({
+                code: 500,
+                status: "error",
+                message: "Internal server error",
+            });
         });
-    })
-    .catch((error) => {
-      return res.json({
-        code: 500,
-        status: "error",
-        message: "Internal server error",
-      });
-    });
 });
 
 router.get("/trainingTask/get", async (req, res, next) => {

@@ -1,7 +1,7 @@
-function trainingTaskReducer(state = {taskList:[], sentList: []}, action){
+function PTOReducer(state = {taskList:[], sentList: []}, action){
     switch(action.type){
-    case "GETTRAININGTASK":
-        return {...state, taskList: action.payload.tasks.received, sentList: action.payload.tasks.sent};
+    case "GETPTO":
+        return {...state, taskList: action.payload.ptoRequests.received, sentList: action.payload.ptoRequests.created};
     case "MOVETASK":
         const newTaskList = state.taskList.map(task => {
             if(state.selectTask.includes(task)){
@@ -18,4 +18,4 @@ function trainingTaskReducer(state = {taskList:[], sentList: []}, action){
 
 }
 
-export default trainingTaskReducer;
+export default PTOReducer;

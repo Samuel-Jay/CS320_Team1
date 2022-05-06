@@ -52,6 +52,7 @@ export const changeStatus = (newStatus) => async(dispatch) => {
 
 export const changeType = (newType) => async(dispatch) => {
     try {
+        console.log(newType)
         dispatch({type: "CHANGETYPE", payload: newType})
     } catch (err) {
         

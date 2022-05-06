@@ -10,14 +10,14 @@ import ListItemText from '@mui/material/ListItemText';
 import React, {useState, useEffect} from 'react';
 import Task from './Task.jsx'
 import {useDispatch} from 'react-redux';
-import {openTask} from '../../actions/Task.js';
-import {getTrainingTask} from '../../actions/TrainingTask.js';
+import {openTask} from '../../../actions/Task.js';
+import {getPTO} from '../../../actions/PTO.js';
 
 const TraningTasks = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         console.log("use effecting")
-        dispatch(getTrainingTask());
+        dispatch(getPTO());
     }, [dispatch])
 
     function handleWindow(task){
@@ -29,7 +29,7 @@ const TraningTasks = () => {
         backgroundColor: '#FFFFFF',
         padding: 0,
     };
-    let taskList=useSelector((state ) => state.TrainingTask.taskList);
+    let taskList=useSelector((state ) => state.PTO.taskList);
     console.log(taskList)
     const query = useSelector((state) => state.task.query);
     const show = useSelector((state) => state.task.status);

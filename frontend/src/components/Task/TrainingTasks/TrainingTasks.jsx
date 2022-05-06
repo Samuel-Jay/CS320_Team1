@@ -10,8 +10,8 @@ import ListItemText from '@mui/material/ListItemText';
 import React, {useState, useEffect} from 'react';
 import Task from './Task.jsx'
 import {useDispatch} from 'react-redux';
-import {openTask} from '../../actions/Task.js';
-import {getTrainingTask} from '../../actions/TrainingTask.js';
+import {openTask} from '../../../actions/Task.js';
+import {getTrainingTask} from '../../../actions/TrainingTask.js';
 
 const TraningTasks = () => {
     const dispatch = useDispatch();
@@ -38,14 +38,13 @@ const TraningTasks = () => {
             { 
                 show==="All"?taskList.filter(task => {
                     return query === ""
-                    // || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
-                    // || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
+                        || task.assignerEmail.toLowerCase().includes(query.toLowerCase())
+                        || task.assigneeEmail.toLowerCase().includes(query.toLowerCase())
                         || task.taskDescription.toLowerCase().includes(query.toLowerCase())
                         || task.taskLink.toLowerCase().includes(query.toLowerCase())
                         || task.taskName.toLowerCase().includes(query.toLowerCase())
                 }).map(task=>
                     {
-                        console.log(task)
                         return(
                             <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
                         )

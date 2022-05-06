@@ -20,16 +20,19 @@ const TraningTasks = () => {
         dispatch(getTrainingTask());
     }, [dispatch])
 
-    function handleWindow(task){
-        dispatch(openTask(task))
-    }
     const flexContainer ={
         display:'flex',
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
         padding: 0,
     };
-    let taskList=useSelector((state ) => state.TrainingTask.taskList);
+    const receive = useSelector((state) => state.task.receive);
+    let taskList=useSelector((state ) => state.TrainingTask);
+    if(receive == "receive"){
+        taskList = taskList.taskList
+    }else{
+        taskList = taskList.sentList
+    }
     console.log(taskList)
     const query = useSelector((state) => state.task.query);
     const show = useSelector((state) => state.task.status);
@@ -46,18 +49,18 @@ const TraningTasks = () => {
                 }).map(task=>
                     {
                         return(
-                            <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
+                            <Task key={task._id} task={task} />
                         )
-                    }):(taskList.filter(task=>{
-                        return show.toLowerCase()===task.status.toLowerCase()
-                            && (query === ""
-                                || task.taskDescription.toLowerCase().includes(query.toLowerCase())
-                                || task.taskLink.toLowerCase().includes(query.toLowerCase())
-                                || task.taskName.toLowerCase().includes(query.toLowerCase()))
+                }):(taskList.filter(task=>{
+                    return show.toLowerCase()===task.status.toLowerCase()
+                        && (query === ""
+                            || task.taskDescription.toLowerCase().includes(query.toLowerCase())
+                            || task.taskLink.toLowerCase().includes(query.toLowerCase())
+                            || task.taskName.toLowerCase().includes(query.toLowerCase()))
                     }).map(task=>
                         {
                             return(
-                                <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
+                                <Task key={task._id} task={task} />
                             )
                         }
                     ))

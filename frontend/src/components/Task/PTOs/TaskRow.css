@@ -33,7 +33,7 @@
  .EmailRow .EmailRow_Subject  h4 {
   width: 70%;
   white-space: nowrap;
-  overflow: hidden;
+  /* overflow: hidden; */
   text-overflow: ellipsis;
   padding-left: 5px;
   padding-right: 5px;

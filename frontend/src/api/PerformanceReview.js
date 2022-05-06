@@ -12,3 +12,8 @@ export const getPerformanceReview = () => {
     const {token} = JSON.parse(localStorage.getItem("profile"));
     return instance.get("/performancereview/get", {params: {secret_token: token}});   
 };
+
+export const getEmployees = () => {
+    const {token} = JSON.parse(localStorage.getItem("profile"));
+    return instance.get("/performanceReview/employee", {params: {secret_token: token}});   
+};

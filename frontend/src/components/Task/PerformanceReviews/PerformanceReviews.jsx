@@ -20,16 +20,20 @@ const PerformanceReviews = () => {
         dispatch(getPerformanceReview());
     }, [dispatch])
 
-    function handleWindow(task){
-        dispatch(openTask(task))
-    }
     const flexContainer ={
         display:'flex',
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
         padding: 0,
     };
-    let taskList=useSelector((state ) => state.PerformanceReview.taskList);
+
+    const receive = useSelector((state) => state.task.receive);
+    let taskList=useSelector((state ) => state.PerformanceReview);
+    if(receive == "receive"){
+        taskList = taskList.taskList
+    }else{
+        taskList = taskList.sentList
+    }
     const query = useSelector((state) => state.task.query);
     const show = useSelector((state) => state.task.status);
     return(
@@ -42,7 +46,7 @@ const PerformanceReviews = () => {
                 }).map(task=>
                     {
                         return(
-                            <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
+                            <Task key={task._id} task={task} />
                         )
                     }):(taskList.filter(task=>{
                         return show.toLowerCase()===task.status.toLowerCase()
@@ -53,7 +57,7 @@ const PerformanceReviews = () => {
                     }).map(task=>
                         {
                             return(
-                                <Task key={task._id} task={task} onClick={()=>{handleWindow(task)}}/>
+                                <Task key={task._id} task={task} />
                             )
                         }
                     ))

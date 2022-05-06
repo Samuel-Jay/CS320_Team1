@@ -7,7 +7,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import React, {useState} from 'react';
 import Input from './Input.jsx';
 import {useDispatch} from 'react-redux';
-import {createPTO} from '../../actions/PTO.js';
+import {createPTO, getPTO} from '../../actions/PTO.js';
 
 function PTOForm(){
     const dispatch = useDispatch();
@@ -16,9 +16,10 @@ function PTOForm(){
     function handleSubmit(e){
         e.preventDefault();
         console.log(taskForm);
-        dispatch(createPTO(taskForm)).then(
+        dispatch(createPTO(taskForm)).then(() =>{
             setSuccess(true)
-        );
+            dispatch(getPTO())
+        });
     }
 
     function handleChange(e){

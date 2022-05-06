@@ -1,7 +1,7 @@
 function trainingTaskReducer(state = {taskList:[], sentList: [], selectTask: []}, action){
     switch(action.type){
     case "GETTRAININGTASK":
-        return {...state, taskList: action.payload.tasks.received, sentList: action.payload.tasks.sent};
+        return {...state, taskList: action.payload.tasks.received, sentList: action.payload.tasks.created};
     case "SELECTTASK":
         if (state.selectTask.includes(action.payload)){
             return {...state, selectTask: state.selectTask.filter(task => task !== action.payload) }

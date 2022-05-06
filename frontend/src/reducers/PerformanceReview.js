@@ -1,7 +1,9 @@
-function trainingTaskReducer(state = {taskList:[], sentList: []}, action){
+function trainingTaskReducer(state = {taskList:[], sentList: [], employees: []}, action){
     switch(action.type){
+    case "GETEMPLOYEE":
+        return {...state, employees: action.payload.result}
     case "GETPERFORMANCEREVIEW":
-        return {...state, taskList: action.payload.tasks.received, sentList: action.payload.tasks.sent};
+        return {...state, taskList: action.payload.tasks.received, sentList: action.payload.tasks.created};
     case "MOVETASK":
         const newTaskList = state.taskList.map(task => {
             if(state.selectTask.includes(task)){

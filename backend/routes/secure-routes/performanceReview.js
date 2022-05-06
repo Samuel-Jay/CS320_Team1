@@ -6,7 +6,19 @@ const userSchema = require("../../schema/UserSchema");
 const { companies } = require("../../config");
 const generateHash = require("../../utils/hashIdGenerator");
 
-router.post("/performanceReview/create", (req, res, next) => {
+router.get("/performanceReview/employee", async (req, res, next) => {
+    const companyDB = companies.get(req.user.email.split("@")[1]);
+    const User = mongoose.connection
+          .useDb(companyDB)
+          .model("users", userSchema);
+    const user = await User.findOne({_id: req.user._id})
+    const employee = await User.find({managerId: user.managerId})
+    const manager = await User.findOne({employeeId: user.managerId})
+    let result = [...employee, manager]
+    return res.status(200).json({result});
+})
+
+router.post("/performanceReview/create", async (req, res, next) => {
     try {
         const companyDB = companies.get(req.user.email.split("@")[1]);
         const User = mongoose.connection
@@ -28,18 +40,16 @@ router.post("/performanceReview/create", (req, res, next) => {
                 reviewerId: reviewer.employeeId,
                 revieweeId: user.employeeId,
                 revieweeManagerId: user.managerId,
-                companyId: user.companyId,
-                companyName: user.companyName,
-                overallComments: req.body.overallComments,
-                growthFeedbackComments: req.body.growthFeedbackComments,
-                growthFeedbackScore: req.body.growthFeedbackScore,
-                kindnessFeedbackComments: req.body.kindnessFeedbackComments,
-                kindnessFeedbackScore: req.body.kindnessFeedbackScore,
-                deliveryFeedbackComments: req.body.deliveryFeedbackComments,
-                deliveryFeedbackScore: req.body.deliveryFeedbackScore,
+                overallComments: "",
+                growthFeedbackComments: "",
+                growthFeedbackScore: 0,
+                kindnessFeedbackComments: "",
+                kindnessFeedbackScore: 0,
+                deliveryFeedbackComments: "",
+                deliveryFeedbackScore: 0,
                 startDate: req.body.startDate,
                 dueDate: req.body.dueDate,
-                status: req.body.status,
+                status: "Incomplete",
             };
             const performanceReview = await PerformanceReview.create(taskData);
             await performanceReview.save();
@@ -62,9 +72,10 @@ router.get("/performanceReview/get", async (req, res, next) => {
     const getUserDetails = require("../../utils/").getUserDetails;
     await User.findOne({ email: req.user.email })
         .then(async (user) => {
+            console.log(user.employeeId)
             userPerformanceReviews = {};
             userPerformanceReviews["created"] = await PerformanceReview.find({
-                assignerId: user.employeeId,
+                $or:[{revieweeId: user.employeeId}]
             })
                 .then(async (tasks) => {
                     console.log(tasks)
@@ -97,7 +108,7 @@ router.get("/performanceReview/get", async (req, res, next) => {
                 });
 
             userPerformanceReviews["received"] = await PerformanceReview.find({
-                assigneeId: user.employeeId,
+                $or:[{reviewerId: user.employeeId}, {revieweeManagerId: user.employeeId} ]
             })
                 .then(async (tasks) => {
                     for (let [idx, task] of tasks.entries()) {
@@ -141,7 +152,7 @@ router.get("/performanceReview/get", async (req, res, next) => {
         });
 });
 
-router.patch("/PerformanceReview/edit", (req, res, next) => {
+router.patch("/PerformanceReview/edit", async (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.requestorEmail.split("@")[1]);
         const User = mongoose.connection
@@ -219,19 +230,19 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
                         });
                     }
                     if (len(req.body.growthFeedback) == 0 &
-                    isAlpha(req.body.growthFeedback)) {
+                        isAlpha(req.body.growthFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
                     if (len(req.body.kindnessFeedback) == 0 &
-                    isAlpha(req.body.kindnessFeedback)) {
+                        isAlpha(req.body.kindnessFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
                     }
                     if (len(req.body.deliveryFeedback) == 0 &
-                    isAlpha(req.body.deliveryFeedback)) {
+                        isAlpha(req.body.deliveryFeedback)) {
                         return res.json({
                             message: "Cannot provide unjustified rating score.",
                         });
@@ -287,7 +298,7 @@ router.patch("/PerformanceReview/edit", (req, res, next) => {
     }
 });
 
-router.delete("/PerformanceReview/delete", (req, res, next) => {
+router.delete("/PerformanceReview/delete",  async (req, res, next) => {
     try {
         const companyDB = companies.get(req.body.assignerEmail.split("@")[1]);
         const PerformanceReview = mongoose.connection

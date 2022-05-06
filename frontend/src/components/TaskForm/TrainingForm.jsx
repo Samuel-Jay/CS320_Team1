@@ -10,20 +10,19 @@ import {useDispatch} from 'react-redux';
 import {useSelector} from 'react-redux';
 import {signin} from '../../actions/User.js';
 import {useNavigate} from 'react-router-dom';
-import {createTrainingTask} from '../../actions/TrainingTask.js';
+import {createTrainingTask, getTrainingTask} from '../../actions/TrainingTask.js';
 
 function TrainingForm(){
     const dispatch = useDispatch();
     const [taskForm, setTaskForm] = useState({taskName: "", taskLink: "", taskDescription: "", startDate: new Date(), dueDate: new Date()})
     const [success, setSuccess] = useState(false)
-    const [showPassword, setShowPassword] = useState(false);
-    const employees = JSON.parse(localStorage.getItem("employees"))
     function handleSubmit(e){
         e.preventDefault();
         console.log(taskForm);
-        dispatch(createTrainingTask(taskForm)).then(
+        dispatch(createTrainingTask(taskForm)).then(() => {
             setSuccess(true)
-        );
+            dispatch(getTrainingTask())
+        });
     }
 
     function handleChange(e){

@@ -18,14 +18,7 @@ const PerformanceReview = new mongoose.Schema(
             type: Number,
             required: false
         },
-        companyId: {
-            type: Number,
-            required: true,
-        },
-        companyName: {
-            type: String,
-            required: true,
-        },
+
         overallComments: {
             type: String,
             required: false,
@@ -56,11 +49,11 @@ const PerformanceReview = new mongoose.Schema(
         },
         startDate: {
             type: Date,
-            required: true,
+            required: false,
         },
         dueDate: {
             type: Date,
-            required: true,
+            required: false,
         },
         status: {
             type: String,

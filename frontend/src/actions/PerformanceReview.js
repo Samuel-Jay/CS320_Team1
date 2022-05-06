@@ -18,3 +18,13 @@ export const getPerformanceReview = () => async(dispatch) => {
         console.log(err);
     }
 };
+
+export const getEmployees = () => async(dispatch) => {
+    try{
+        const {data} = await taskAPI.getEmployees();
+        console.log(data)
+        dispatch({type: "GETEMPLOYEE", payload: data});
+    }catch(err){
+        console.log(err);
+    }
+};
